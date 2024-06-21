@@ -78,6 +78,7 @@
 21/06/2024 13:12:59 [INFO]: HTTP Server listening on port 4000
 21/06/2024 13:16:20 [INFO]: HTTP Server listening on port 4000
 21/06/2024 14:44:44 [INFO]: HTTP Server listening on port 4000
+<<<<<<< HEAD
 21/06/2024 14:52:17 [INFO]: HTTP Server listening on port 4000
 21/06/2024 14:53:35 [INFO]: HTTP Server listening on port 4000
 21/06/2024 14:55:29 [INFO]: HTTP Server listening on port 4000
@@ -159,3 +160,36 @@
 21/06/2024 18:07:30 [INFO]: HTTP Server listening on port 4000
 21/06/2024 18:08:23 [INFO]: HTTP Server listening on port 4000
 21/06/2024 18:13:01 [INFO]: HTTP Server listening on port 4000
+=======
+21/06/2024 14:54:46 [INFO]: HTTP Server listening on port 4000
+21/06/2024 15:06:47 [INFO]: HTTP Server listening on port 4000
+21/06/2024 15:22:46 [INFO]: HTTP Server listening on port 4000
+21/06/2024 15:25:29 [INFO]: HTTP Server listening on port 4000
+21/06/2024 15:30:22 [INFO]: HTTP Server listening on port 4000
+21/06/2024 15:34:03 [INFO]: HTTP Server listening on port 4000
+21/06/2024 15:44:54 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:02:08 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:05:09 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:07:02 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:08:16 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:13:14 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:15:00 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:15:44 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:17:52 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:21:30 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:23:17 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:46:44 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:47:00 [ERROR]: Error in add new client: Error: Failed to add new client
+21/06/2024 16:48:39 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:48:47 [ERROR]: Error in add new client: Error: Client with this email already exists
+21/06/2024 16:53:34 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:53:40 [ERROR]: Error in add new client: Error: Client with this email already exists
+21/06/2024 16:54:08 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:54:12 [ERROR]: Error in add new client: Error: Client with this email already exists
+21/06/2024 16:54:52 [INFO]: HTTP Server listening on port 4000
+21/06/2024 16:54:58 [ERROR]: Error in add new client: Error: Failed to add new client
+21/06/2024 16:55:50 [INFO]: HTTP Server listening on port 4000
+21/06/2024 17:02:26 [INFO]: HTTP Server listening on port 4000
+21/06/2024 17:24:28 [INFO]: HTTP Server listening on port 4000
+21/06/2024 17:26:53 [INFO]: HTTP Server listening on port 4000
+>>>>>>> 9cbe31beea743a2705601f9e3cd6e0c2f467440b

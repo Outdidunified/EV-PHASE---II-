@@ -7,7 +7,9 @@ const logger = require('./logger');
 // Load environment variables from .env file
 dotenv.config();
 
-const SupertAdminRouter = require('./router/Super_Admin_Router.js');
+const SuperAdminRouter = require('./router/Super_Admin_Router.js');
+const ResellerAdminRouter = require('./router/ReSeller_Admin_Router.js');
+
 app.use(express.json());
 
 
@@ -16,7 +18,8 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/superadmin', SupertAdminRouter);
+app.use('/superadmin', SuperAdminRouter);
+app.use('/reselleradmin', ResellerAdminRouter);
 
 // Create an HTTP server using Express app
 const httpServer = http.createServer(app);
