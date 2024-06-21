@@ -112,6 +112,10 @@ async function updateClient(req){
         const db = await database.connectToDatabase();
         const clientCollection = db.collection("client_details");
 
+        if(!client_id || !client_name || !client_phone_no || !client_address || !modified_by){
+            throw new Error(`Client update fields are not available`);
+        }
+
         const where = { client_id: client_id };
 
         const updateDoc = {
