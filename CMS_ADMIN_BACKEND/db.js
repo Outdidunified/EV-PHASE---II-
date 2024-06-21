@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
 
-const url = '';
-const dbName = '';
+const url = 'mongodb+srv://outdid:outdid@cluster0.t16a63a.mongodb.net/';
+const dbName = 'ev_power';
 let client;
 
 //database connection
