@@ -1,25 +1,37 @@
-const { connectToDatabase } = require('../db.js');
+const database = require('../db');
 
-const authenticate = async(req, res, next) => {
+const authenticate = async (req, res, next) => {
     try {
-        const email = req.body.email;
-        const password = req.body.password;
-        const admin = req.body.superadmin;
+        const { email, password, admin } = req.body;
 
-        const db = await connectToDatabase();
-        const usersCollection = db.collection('users');
-
-        // Check if both email and password are empty
+        // Check if email, password, or admin is missing
         if (!email || !password || !admin) {
-            const errorMessage = 'Invalid credentials';
-            return res.status(401).json({ message: errorMessage });
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        const user = await usersCollection.findOne({ username: email });
+        const db = await database.connectToDatabase();
+        const usersCollection = db.collection('users');
 
-        if (!user || user.password !== password || user.role_id !== 1) {
-            const errorMessage = 'Invalid credentials';
-            return res.status(401).json({ message: errorMessage });
+        // Use aggregation to get user and role in one query with a limit of 1
+        const userWithRole = await usersCollection.aggregate([
+            { $match: { email_id: email } },
+            {
+                $lookup: {
+                    from: 'user_roles',
+                    localField: 'role_id',
+                    foreignField: 'role_id',
+                    as: 'roles'
+                }
+            },
+            { $unwind: '$roles' },
+            { $match: { 'roles.role_name': admin } },
+            { $limit: 1 }
+        ]).toArray();
+
+        const user = userWithRole[0];
+        // Check if user and role are valid
+        if (!user || user.password !== password || user.roles.role_name !== admin) {
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
 
         // Continue to the next middleware or route handler
@@ -27,8 +39,7 @@ const authenticate = async(req, res, next) => {
 
     } catch (error) {
         console.error(error);
-        const errorMessage = 'Internal Server Error';
-        return res.status(500).json({ message: errorMessage });
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
 
