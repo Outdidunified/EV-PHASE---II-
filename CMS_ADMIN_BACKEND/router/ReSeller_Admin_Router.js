@@ -14,27 +14,25 @@ router.post('/CheckLoginCredentials', async(req, res) => {
     }
 });
 
+
 // Route to fetch the client details
-router.get('/getAllClients', async(req, res) => {
-    try{
-        const {reseller_id} = req.body;
-        const getresellerClients = await functions.FetchAllClients(reseller_id);
+router.get('/getAllClients', async (req, res) => {
+    try {
+        const getresellerClients = await functions.FetchAllClients(req, res); // Pass req and res to the function
         res.status(200).json({ message: 'Success', data: getresellerClients });
-    }catch(error){
+    } catch (error) {
         console.error('Error in getAllClients route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to fetch client details' });
     }
 });
 
 // Route to de-activate the client
-router.post('/DeActivateClient', async(req, res) => {
-    try{
-        const {client_id,modified_by,status} = req.body;
-        const DeActivateClient = await functions.DeActivateClient(client_id,modified_by,status);
-        res.status(200).json({ message: 'Success', data: DeActivateClient });
-    }catch(error){
+router.post('/DeActivateClient', functions.DeActivateClient, (req, res) => {
+    try {
+        res.status(200).json({ status: 'Success' ,  message: 'User deactivated successfully' });
+    } catch (error) {
         console.error('Error in DeActivateClient route:', error);
-        res.status(500).json({ status: 'Failed', message: 'Failed to de activate client' });
+        res.status(500).json({ status: 'Failed', message: 'Failed to deactivate client' });
     }
 });
 

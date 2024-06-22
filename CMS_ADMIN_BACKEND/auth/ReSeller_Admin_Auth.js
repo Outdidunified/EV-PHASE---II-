@@ -3,7 +3,6 @@ const database = require('../db');
 const authenticate = async (req, res, next) => {
     try {
         const { email, password, admin } = req.body;
-
         // Check if email, password, or admin is missing
         if (!email || !password || !admin) {
             return res.status(401).json({ message: 'Invalid credentials' });

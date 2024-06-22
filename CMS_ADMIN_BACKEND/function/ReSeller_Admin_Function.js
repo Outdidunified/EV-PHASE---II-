@@ -1,51 +1,60 @@
 const database = require('../db');
 const logger = require('../logger');
 
-async function FetchAllClients(reseller_id){
-    try{
+async function FetchAllClients(req, res) {
+    try {
+        const { reseller_id } = req.query; 
         const db = await database.connectToDatabase();
         const clientCollection = db.collection("client_details");
 
-        const clientList = await clientCollection.find({reseller_id: reseller_id}).toArray();
+        const clientList = await clientCollection.find({ reseller_id: parseInt(reseller_id) }).toArray();
 
         return clientList;
 
-    }catch(error){
+    } catch (error) {
+        console.error(`Error fetching client details: ${error}`);
         logger.error(`Error fetching client details: ${error}`);
         throw new Error('Error fetching client details');
     }
 }
 
-async function DeActivateClient(client_id,modified_by,status){
-    try{
+
+async function DeActivateClient(req, res,next) {
+    const { client_id, modified_by, status } = req.body;
+    try {
+
         const db = await database.connectToDatabase();
         const clientCollection = db.collection("client_details");
 
-        // Convert client_id to ObjectId if needed (assuming client_id is stored as ObjectId)
-        const where = { client_id: client_id };
-
-        // Update fields: status and modified_by
-        const updateDoc = {
-            $set: {
-                status: status,
-                modified_by: modified_by,
-                modified_date: new Date()
-            }
-        };
-
-        const result = await clientCollection.updateOne(where, updateDoc);
-
-        if (result.modifiedCount === 0) {
-            throw new Error(`Client with ID ${client_id} not found`);
+        // Check if the user exists
+        const existingUser = await clientCollection.findOne({ client_id: client_id });
+        if (!existingUser) {
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        return result;
+        // Update user status
+        const updateResult = await clientCollection.updateOne(
+            { client_id: client_id },
+            {
+                $set: {
+                    status: status,
+                    modified_by: modified_by,
+                    modified_date: new Date()
+                }
+            }
+        );
 
-    }catch(error){
-        logger.error(`Error in de active client: ${error}`);
-        throw new Error('Error in de active client');
+        if (updateResult.matchedCount === 0) {
+            return res.status(500).json({ message: 'Failed to update  status' });
+        }
+
+        next();
+    } catch (error) {
+        logger.error(`Error in deactivating client: ${error}`);
+        throw new Error('Error in deactivating client');
     }
 }
+
 
 // add new client
 async function addNewClient(req){

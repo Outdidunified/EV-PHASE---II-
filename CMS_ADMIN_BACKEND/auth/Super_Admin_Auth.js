@@ -1,12 +1,12 @@
 const database = require('../db');
 
-const authenticate = async (req, res, next) => {
+const authenticate = async (req, res) => {
     try {
         const { email, password, admin } = req.body;
 
         // Check if email, password, or admin is missing
         if (!email || !password || !admin) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return { error: true, status: 401, message: 'Invalid credentials' };
         }
 
         const db = await database.connectToDatabase();
@@ -31,17 +31,19 @@ const authenticate = async (req, res, next) => {
         const user = userWithRole[0];
         // Check if user and role are valid
         if (!user || user.password !== password || user.roles.role_name !== admin) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return { error: true, status: 401, message: 'Invalid credentials' };
         }
 
-        // Continue to the next middleware or route handler
-        next();
+        // Return user_id and email_id
+        return { error: false, user: { user_id: user.user_id, email_id: user.email_id } };
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        return { error: true, status: 500, message: 'Internal Server Error' };
     }
 };
+
+
 
 
 module.exports = { authenticate };
