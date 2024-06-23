@@ -157,6 +157,7 @@ async function FetchUser() {
         throw new Error('Error fetching users');
     }
 }
+
 // Create User
 async function CreateUser(req, res, next) {
     try {
@@ -730,7 +731,51 @@ async function DeActivateOrActivateReseller(req, res, next) {
     }
 }
 
+//ASSIGN_CHARGER_TO_RESELLER
+//AssginChargerToReseller 
+async function AssginChargerToReseller(req, res) {
+    try {
+        const {reseller_id,charger_id,modified_by} = req.body;
 
+        // Validate required fields
+        if (!reseller_id  || !charger_id || !modified_by) {
+            return res.status(400).json({ message: 'Reseller ID , Username and ChargerID are required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const devicesCollection = db.collection("charger_details");
+
+        // Check if the Charger exists
+        const existingReseller = await devicesCollection.findOne({ charger_id: charger_id });
+
+        if (!existingReseller) {
+            return res.status(404).json({ message: 'Charger not found' });
+        }
+
+        // Update the reseller details
+        const result = await devicesCollection.updateOne(
+            { charger_id: charger_id },
+            {
+                $set: {
+                    assigned_reseller_id: reseller_id,
+                    modified_date: new Date(),
+                    modified_by
+                }
+            }
+        );
+
+        if (result.modifiedCount === 0) {
+            throw new Error('Failed to assgin charger to reseller');
+        }
+
+        return res.status(200).json({ message: 'Charger Successfully Assigned ' });
+
+    } catch (error) {
+        console.error(error);
+        logger.error(`Error updating reseller: ${error}`);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
 
 module.exports = { 
     //USER_ROLE
@@ -757,5 +802,5 @@ module.exports = {
     UpdateReseller,
     DeActivateOrActivateReseller,
     //ASSIGN TO RESELLER
-
+    AssginChargerToReseller,
 };

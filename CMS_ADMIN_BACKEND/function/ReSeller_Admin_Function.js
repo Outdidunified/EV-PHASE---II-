@@ -18,7 +18,6 @@ async function FetchAllClients(req, res) {
     }
 }
 
-
 async function DeActivateClient(req, res,next) {
     const { client_id, modified_by, status } = req.body;
     try {
@@ -54,7 +53,6 @@ async function DeActivateClient(req, res,next) {
         throw new Error('Error in deactivating client');
     }
 }
-
 
 // add new client
 async function addNewClient(req){

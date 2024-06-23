@@ -190,4 +190,13 @@ router.get('/FetchUnallocatedCharger', async (req, res) => {
         res.status(500).json({ status: 'Failed', message: 'Failed to fetch unallocated charger' });
     }
 });
+// Route to AssginChargerToReseller
+router.post('/AssginChargerToReseller', async (req, res) => {
+    try {
+        await functions.AssginChargerToReseller(req, res);
+    } catch (error) {
+        console.error('Error in AssginChargerToReseller route:', error); 
+        res.status(500).json({ message: 'Failed to AssginChargerToReseller' });
+    }
+});
 module.exports = router;
