@@ -257,7 +257,7 @@ async function FetchAllocatedCharger() {
         const devicesCollection = db.collection("charger_details");
 
         // Query to fetch chargers where assigned_reseller_id is null
-        const chargers = await devicesCollection.find({ assigned_association_id: !null }).toArray();
+        const chargers = await devicesCollection.find({ assigned_client_id: { $ne: null } }).toArray();
 
         return chargers; // Only return data, don't send response
     } catch (error) {

@@ -2,17 +2,17 @@ const database = require('../db');
 
 const authenticate = async (req, res) => {
     try {
-        const { email, password, admin } = req.body;
+        const { email, password } = req.body;
 
-        // Check if email, password, or admin is missing
-        if (!email || !password || !admin) {
+        // Check if email or password is missing
+        if (!email || !password) {
             return { error: true, status: 401, message: 'Invalid credentials' };
         }
 
         const db = await database.connectToDatabase();
         const usersCollection = db.collection('users');
 
-        // Use aggregation to get user and role in one query with a limit of 1
+        // Query to get user by email with the role
         const userWithRole = await usersCollection.aggregate([
             { $match: { email_id: email } },
             {
@@ -24,24 +24,30 @@ const authenticate = async (req, res) => {
                 }
             },
             { $unwind: '$roles' },
-            { $match: { 'roles.role_name': admin } },
             { $limit: 1 }
         ]).toArray();
 
+        if (userWithRole.length === 0) {
+            return { error: true, status: 401, message: 'Invalid credentials' };
+        }
+
         const user = userWithRole[0];
-        // Check if user and role are valid
-        if (!user || user.password !== password || user.roles.role_name !== admin) {
+
+        // Check if the password is valid
+        if (user.password !== password) {
             return { error: true, status: 401, message: 'Invalid credentials' };
         }
 
         // Return user_id and email_id
-        return { error: false, user: { user_id: user.user_id, email_id: user.email_id } };
+        return { error: false, user: { user_id: user.user_id,username: user.username ,email_id: user.email_id } };
 
     } catch (error) {
         console.error(error);
         return { error: true, status: 500, message: 'Internal Server Error' };
     }
 };
+
+module.exports = { authenticate };
 
 
 

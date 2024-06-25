@@ -68,7 +68,19 @@ router.get('/FetchUsers', async (req, res) => {
     } catch (error) {
         console.error('Error in FetchUser route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to fetch users' });
-    }});
+}});
+// Route to FetchSpecificUserForSelection 
+router.get('/FetchSpecificUserForSelectionRoles', async (req, res) => {
+    try {
+        // Call FetchUser function to get users data
+        const user = await functions.FetchSpecificUserForSelection(req, res);
+        // Send response with users data
+        res.status(200).json({ status: 'Success', data: user });
+        
+    } catch (error) {
+        console.error('Error in FetchSpecificUserForCreateSelection route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to FetchSpecificUserForCreateSelection ' });
+}});
 // Route to CreateUser
 router.post('/CreateUser', functions.CreateUser, (req, res) => {
     res.status(200).json({ status: 'Success' ,message: 'New user created successfully' });
@@ -150,6 +162,29 @@ router.get('/FetchResellers', async (req, res) => {
     } catch (error) {
         console.error('Error in FetchResellers route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to fetch Resellers' });
+    }
+});
+// Route to FetchAssignedClients
+router.get('/FetchAssignedClients', async (req, res) => {
+    try {
+        await functions.FetchAssignedClients(req, res);
+    } catch (error) {
+        console.error('Error in FetchAssignedClients route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to FetchAssignedClients' });
+    }
+});
+// Route to FetchChargerDetailsWithSession
+router.get('/FetchChargerDetailsWithSession', async (req, res) => {
+    try {
+        const ChargersWithSession = await functions.FetchChargerDetailsWithSession(req,res);
+        
+        // Filter out any circular references (optional, only if necessary)
+        const Chargers = JSON.parse(JSON.stringify(ChargersWithSession));
+        
+        res.status(200).json({ status: 'Success', data: Chargers });
+    } catch (error) {
+        console.error('Error in FetchAssignedClients route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to FetchAssignedClients' });
     }
 });
 // Route to create a new reseller

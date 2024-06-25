@@ -157,7 +157,43 @@ async function FetchUser() {
         throw new Error('Error fetching users');
     }
 }
+//FetchSpecificUserForSelection
+async function FetchSpecificUserForSelection() {
+    try {
+        const db = await database.connectToDatabase();
+        const usersCollection = db.collection("users");
 
+       // Use aggregation to fetch users with their roles, filtering for role_id 1 and 2
+        const usersWithRoles = await usersCollection.aggregate([
+                {
+                    $lookup: {
+                        from: 'user_roles',
+                        localField: 'role_id',
+                        foreignField: 'role_id',
+                        as: 'role_details'
+                    }
+                },
+                { $unwind: '$role_details' },
+                {
+                    $match: {
+                        'role_details.role_id': { $in: [1, 2] }
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        role_id: '$role_details.role_id',
+                        role_name: '$role_details.role_name'
+                    }
+                }
+            ]).toArray();
+        // Return the users data
+        return usersWithRoles;
+    } catch (error) {
+        logger.error(`Error fetching users: ${error}`);
+        throw new Error('Error fetching users');
+    }
+}
 // Create User
 async function CreateUser(req, res, next) {
     try {
@@ -336,7 +372,7 @@ async function FetchUserProfile(req, res) {
 }
 // UpdateUserProfile
 async function UpdateUserProfile(req, res,next) {
-    const { user_id, username, phone_no, password, wallet_bal, modified_by, status } = req.body;
+    const { user_id, username, phone_no, password, modified_by, status } = req.body;
 
     try {
         // Validate the input
@@ -361,7 +397,6 @@ async function UpdateUserProfile(req, res,next) {
                     username: username,
                     phone_no: phone_no,
                     password: password,
-                    wallet_bal: wallet_bal,
                     modified_by: modified_by,
                     modified_date: new Date(),
                     status: status
@@ -396,7 +431,6 @@ async function FetchCharger() {
         throw new Error('Failed to fetch chargers'); // Throw error, handle in route
     }
 }
-
 //CreateCharger
 async function CreateCharger(req, res) {
     try {
@@ -579,6 +613,112 @@ async function FetchResellers(req, res) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 }
+//FetchAssignedClients
+async function FetchAssignedClients(req, res) {
+    try {
+        const { reseller_id } = req.body;
+
+        // Validate reseller_id
+        if (!reseller_id) {
+            return res.status(400).json({ message: 'Reseller ID is required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const clientCollection = db.collection("client_details");
+
+        // Query to fetch clients for the specific reseller_id
+        const clients = await clientCollection.find({ reseller_id: reseller_id }).toArray();
+
+        if (!clients || clients.length === 0) {
+            return res.status(404).json({ message: 'No client details found for the specified reseller_id' });
+        }
+
+        // Return the client data
+        return res.status(200).json({ status: 'Success', data: clients });
+
+    } catch (error) {
+        console.error(error);
+        logger.error(`Error fetching clients: ${error}`);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+//FetchChargerDetailsWithSession
+async function FetchChargerDetailsWithSession(req, res) {
+    try {
+        const { reseller_id } = req.body;
+
+        // Validate reseller_id
+        if (!reseller_id) {
+            return res.status(400).json({ message: 'Reseller ID is required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const chargerCollection = db.collection("charger_details");
+
+        // Aggregation pipeline to fetch charger details with sorted session data
+        const result = await chargerCollection.aggregate([
+            {
+                $match: { assigned_reseller_id: reseller_id }
+            },
+            {
+                $lookup: {
+                    from: "device_session_details",
+                    localField: "charger_id",
+                    foreignField: "charger_id",
+                    as: "sessions"
+                }
+            },
+            {
+                $addFields: {
+                    chargerID: "$charger_id",
+                    sessiondata: {
+                        $cond: {
+                            if: { $gt: [{ $size: "$sessions" }, 0] },
+                            then: {
+                                $map: {
+                                    input: {
+                                        $sortArray: {
+                                            input: "$sessions",
+                                            sortBy: { stop_time: -1 }
+                                        }
+                                    },
+                                    as: "session",
+                                    in: "$$session"
+                                }
+                            },
+                            else: ["No session found"]
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    chargerID: 1,
+                    sessiondata: 1
+                }
+            }
+        ]).toArray();
+
+        if (!result || result.length === 0) {
+            return res.status(404).json({ message: 'No chargers found for the specified reseller_id' });
+        }
+
+        // Sort sessiondata within each chargerID based on the first session's stop_time
+        result.forEach(charger => {
+            if (charger.sessiondata.length > 1) {
+                charger.sessiondata.sort((a, b) => new Date(b.stop_time) - new Date(a.stop_time));
+            }
+        });
+
+        return result;
+
+    } catch (error) {
+        console.error(error);
+        logger.error(`Error fetching charger details: ${error}`);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
 // CreateReseller 
 async function CreateReseller(req, res) {
     try {
@@ -645,12 +785,13 @@ async function UpdateReseller(req, res) {
             reseller_id,
             reseller_phone_no,
             reseller_address,
-            modified_by
+            modified_by,
+            status
         } = req.body;
 
         // Validate required fields
-        if (!reseller_id  || !reseller_phone_no || !reseller_address || !modified_by) {
-            return res.status(400).json({ message: 'Reseller ID, Name, Phone Number, Email ID, Address, and Modified By are required' });
+        if (!reseller_id  || !reseller_phone_no || !reseller_address || !modified_by || typeof status !== 'boolean') {
+            return res.status(400).json({ message: 'Reseller ID, Name, Phone Number, status, Email ID, Address, and Modified By are required' });
         }
 
         const db = await database.connectToDatabase();
@@ -671,7 +812,8 @@ async function UpdateReseller(req, res) {
                     reseller_phone_no,
                     reseller_address,
                     modified_date: new Date(),
-                    modified_by
+                    modified_by,
+                    status
                 }
             }
         );
@@ -735,29 +877,34 @@ async function DeActivateOrActivateReseller(req, res, next) {
 //AssginChargerToReseller 
 async function AssginChargerToReseller(req, res) {
     try {
-        const {reseller_id,charger_id,modified_by} = req.body;
-
+        const { reseller_id, charger_ids, modified_by } = req.body;
+        
         // Validate required fields
-        if (!reseller_id  || !charger_id || !modified_by) {
-            return res.status(400).json({ message: 'Reseller ID , Username and ChargerID are required' });
+        if (!reseller_id || !charger_ids || !modified_by) {
+            return res.status(400).json({ message: 'Reseller ID, Charger IDs, and Modified By are required' });
         }
 
         const db = await database.connectToDatabase();
         const devicesCollection = db.collection("charger_details");
 
-        // Check if the Charger exists
-        const existingReseller = await devicesCollection.findOne({ charger_id: charger_id });
+        // Ensure charger_ids is an array
+        let chargerIdsArray = Array.isArray(charger_ids) ? charger_ids : [charger_ids];
+        
+        // Check if all the chargers exist
+        const existingChargers = await devicesCollection.find({ charger_id: { $in: chargerIdsArray } }).toArray();
 
-        if (!existingReseller) {
-            return res.status(404).json({ message: 'Charger not found' });
+        if (existingChargers.length !== chargerIdsArray.length) {
+            return res.status(404).json({ message: 'One or more chargers not found' });
         }
 
-        // Update the reseller details
-        const result = await devicesCollection.updateOne(
-            { charger_id: charger_id },
+        // Update the reseller details for all chargers
+        const result = await devicesCollection.updateMany(
+            { charger_id: { $in: chargerIdsArray } },
             {
                 $set: {
                     assigned_reseller_id: reseller_id,
+                    superadmin_commission: 0,
+                    assigned_to_reseller_date: new Date(),
                     modified_date: new Date(),
                     modified_by
                 }
@@ -765,26 +912,30 @@ async function AssginChargerToReseller(req, res) {
         );
 
         if (result.modifiedCount === 0) {
-            throw new Error('Failed to assgin charger to reseller');
+            throw new Error('Failed to assign chargers to reseller');
         }
 
-        return res.status(200).json({ message: 'Charger Successfully Assigned ' });
+        return res.status(200).json({ message: 'Chargers Successfully Assigned' });
 
     } catch (error) {
         console.error(error);
-        logger.error(`Error updating reseller: ${error}`);
+        logger.error(`Error assigning chargers to reseller: ${error}`);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 }
 
+
+
+
 module.exports = { 
-    //USER_ROLE
+    //USER_ROLE 
     CreateUserRole,
     FetchUserRole,
     FetchSpecificUserRole,
     DeActivateOrActivateUserRole,
     //USER
     FetchUser,
+    FetchSpecificUserForSelection,
     CreateUser,
     UpdateUser,
     DeActivateUser,
@@ -796,8 +947,10 @@ module.exports = {
     CreateCharger,
     UpdateCharger,
     DeActivateOrActivateCharger,
-    //RESELLER
+    //MANAGE RESELLER
     FetchResellers,
+    FetchAssignedClients,
+    FetchChargerDetailsWithSession,
     CreateReseller,
     UpdateReseller,
     DeActivateOrActivateReseller,

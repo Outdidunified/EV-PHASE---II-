@@ -3,6 +3,8 @@ const app = express();
 const http = require('http');
 const dotenv = require('dotenv');
 const logger = require('./logger');
+const cors = require('cors');
+app.use(cors());
 
 // Load environment variables from .env file
 dotenv.config();

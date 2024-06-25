@@ -6,7 +6,7 @@ const functions = require("../function/Client_Admin_Function.js")
 // Route to check login credentials
 router.post('/CheckLoginCredentials', Auth.authenticate ,async(req, res) => {
     try{
-        res.status(200).json({ status: 'Success',data: {reseller_name:  req.clientDetails.client_id, reseller_id: result.reseller_id}});
+        res.status(200).json({ status: 'Success',data:  req.clientDetails});//client id & clinet name & userrname then useri id 
     }catch(error){
         console.error('Error in CheckLoginCredentials route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to check login credentials' });
