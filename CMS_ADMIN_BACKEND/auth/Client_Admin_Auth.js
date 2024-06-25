@@ -2,9 +2,10 @@ const database = require('../db');
 
 const authenticate = async (req, res, next) => {
     try {
-        const { email, password, admin } = req.body;
-        // Check if email, password, or admin is missing
-        if (!email || !password || !admin) {
+        const { email, password } = req.body;
+
+        // Check if email or password is missing
+        if (!email || !password) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
@@ -12,50 +13,36 @@ const authenticate = async (req, res, next) => {
         const usersCollection = db.collection('users');
         const clientCollection = db.collection('client_details');
 
-        // Use aggregation to get user and role in one query with a limit of 1
-        const userWithRole = await usersCollection.aggregate([
-            { $match: { email_id: email } },
-            {
-                $lookup: {
-                    from: 'user_roles',
-                    localField: 'role_id',
-                    foreignField: 'role_id',
-                    as: 'roles'
-                }
-            },
-            { $unwind: '$roles' },
-            { $match: { 'roles.role_name': admin } },
-            { $limit: 1 }
-        ]).toArray();
-
-
-        if (userWithRole.length === 0) {
-            return res.status(401).json({ message: 'Invalid credentials 1' });
+        // Fetch user by email
+        const user = await usersCollection.findOne({ email_id: email });
+        
+        // Check if user is found and password matches
+        if (!user || user.password !== password) {
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        const user = userWithRole[0];
-        const client_id = user.client_id;
+        // Fetch client details using client_id
+        const getClientdetails = await clientCollection.findOne({ client_id: user.client_id });
 
-        // Fetch the client details
-        const getClientDetails = await clientCollection.findOne({ client_id: client_id });
-
-
-        // Check if user and role are valid
-        if (!user || user.password !== password || user.roles.role_name !== admin) {
-            return res.status(401).json({ message: 'Invalid credentials 2' });
+        // If client details not found, return an error
+        if (!getClientdetails) {
+            return res.status(404).json({ message: 'Client details not found' });
         }
 
-        // If the user is valid, attach the client details to the request object
-        req.clientDetails = getClientDetails;
-
-        // Proceed to the next middleware or route handler
-        next();
+        // Return reseller details and user ID
+        return {
+            user_id: user.user_id,
+            reseller_id: user.reseller_id,
+            client_name: getClientdetails.client_name,
+            client_id: getClientdetails.client_id
+        };
 
     } catch (error) {
         console.error('Error during authentication:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
 
 
 

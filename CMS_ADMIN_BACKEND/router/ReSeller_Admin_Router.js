@@ -11,8 +11,9 @@ router.post('/CheckLoginCredentials', async (req, res) => {
             message: 'Success',
             data: {
                 user_id: result.user_id,
+                reseller_id: result.reseller_id,
                 reseller_name: result.reseller_name,
-                reseller_id: result.reseller_id
+                client_id: result.client_id,
             }
         });
     } catch (error) {
@@ -113,11 +114,11 @@ router.get('/FetchUsers', async (req, res) => {
         console.error('Error in FetchUser route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to fetch users' });
 }});
-// Route to FetchSpecificUserForSelection 
-router.get('/FetchSpecificUserForSelectionRoles', async (req, res) => {
+// Route to FetchSpecificUserRoleForSelection 
+router.get('/FetchSpecificUserRoleForSelection', async (req, res) => {
     try {
         // Call FetchUser function to get users data
-        const user = await functions.FetchSpecificUserForSelection(req, res);
+        const user = await functions.FetchSpecificUserRoleForSelection(req, res);
         // Send response with users data
         res.status(200).json({ status: 'Success', data: user });
         

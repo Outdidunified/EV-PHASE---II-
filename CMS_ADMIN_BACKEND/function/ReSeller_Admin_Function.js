@@ -132,7 +132,7 @@ async function addNewClient(req){
         const modified_by = null;
         const modified_date = null;
         const status = true;
-
+        console.log(reseller_id,client_name,client_phone_no,client_email_id,client_address,created_by)
         const db = await database.connectToDatabase();
         const clientCollection = db.collection("client_details");
 
@@ -273,8 +273,8 @@ async function FetchUser() {
         throw new Error('Error fetching users by role_id');
     }
 }
-//FetchSpecificUserForSelection
-async function FetchSpecificUserForSelection() {
+//FetchSpecificUserRoleForSelection
+async function FetchSpecificUserRoleForSelection() {
     try {
         const db = await database.connectToDatabase();
         const usersCollection = db.collection("users");
@@ -313,11 +313,11 @@ async function FetchSpecificUserForSelection() {
 // Create User
 async function CreateUser(req, res, next) {
     try {
-        const { role_id, username, email_id, password, phone_no, wallet_bal, created_by } = req.body;
+        const { role_id, client_id,reseller_id,username, email_id, password, phone_no, created_by } = req.body;
 
         // Validate the input
-        if (!username || !role_id || !email_id || !password || !created_by) {
-            return res.status(400).json({ message: 'Username, Role ID, Email, Password, and Created By are required' });
+        if (!username || !role_id || !email_id || !password || !created_by || !reseller_id || !client_id) {
+            return res.status(400).json({ message: 'Username, Role ID, Email, reseller id, client id ,Password, and Created By are required' });
         }
 
         const db = await database.connectToDatabase();
@@ -346,15 +346,15 @@ async function CreateUser(req, res, next) {
         // Insert the new user
         await Users.insertOne({
             role_id: role_id,
-            reseller_id: null, // Default value, adjust if necessary
-            client_id: null, // Default value, adjust if necessary
+            reseller_id: reseller_id, // Default value, adjust if necessary
+            client_id: client_id, // Default value, adjust if necessary
             association_id: null, // Default value, adjust if necessary
             user_id: newUserId,
             username: username,
             email_id: email_id,
             password: password,
             phone_no: phone_no,
-            wallet_bal: wallet_bal || 0,
+            wallet_bal: 0,
             autostop_time: null,
             autostop_unit: null,
             autostop_price: null,
@@ -716,6 +716,12 @@ async function UpdateUserProfile(req, res,next) {
         const db = await database.connectToDatabase();
         const usersCollection = db.collection("users");
 
+        // Check if the user exists
+        const existingUser = await usersCollection.findOne({ user_id: user_id });
+        if (!existingUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
         // Update the user profile
         const updateResult = await usersCollection.updateOne(
             { user_id: user_id },
@@ -790,7 +796,7 @@ async function UpdateResellerProfile(req, res,next) {
 module.exports = { 
         //MANAGE USER
         FetchUser,
-        FetchSpecificUserForSelection,
+        FetchSpecificUserRoleForSelection,
         CreateUser,
         UpdateUser,
         DeActivateUser,
