@@ -767,7 +767,7 @@ async function UpdateUserProfile(req, res,next) {
 //UpdateResellerProfile
 async function UpdateResellerProfile(req, res,next) {
     const { reseller_id, modified_by, reseller_phone_no, reseller_address } = req.body;
-
+    
     try {
         // Validate required fields
         if (!reseller_id || !modified_by || !reseller_phone_no || !reseller_address) {
