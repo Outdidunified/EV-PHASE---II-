@@ -12,6 +12,7 @@ dotenv.config();
 const SuperAdminRouter = require('./router/Super_Admin_Router.js');
 const ResellerAdminRouter = require('./router/ReSeller_Admin_Router.js');
 const ClientAdminRouter = require('./router/Client_Admin_Router.js');
+const AssociationAdminRouter = require('./router/Association_Admin_Router.js');
 
 app.use(express.json());
 
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 app.use('/superadmin', SuperAdminRouter);
 app.use('/reselleradmin', ResellerAdminRouter);
 app.use('/clientadmin', ClientAdminRouter);
+app.use('/associationadmin', AssociationAdminRouter);
 
 // Create an HTTP server using Express app
 const httpServer = http.createServer(app);
