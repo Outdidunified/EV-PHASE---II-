@@ -6,7 +6,7 @@ const logger = require('../logger');
 //FetchClients
 async function FetchClients(req, res) {
     try {
-        const { reseller_id } = req.query; 
+        const { reseller_id } = req.body; 
         const db = await database.connectToDatabase();
         const clientCollection = db.collection("client_details");
 
@@ -24,7 +24,6 @@ async function FetchClients(req, res) {
 async function FetchAssignedAssociation(req, res) {
     try {
         const { client_id } = req.body;
-
         // Validate client_id
         if (!client_id) {
             return res.status(400).json({ message: 'Client ID is required' });
@@ -37,7 +36,7 @@ async function FetchAssignedAssociation(req, res) {
         const Association = await AssociationCollection.find({ client_id: client_id }).toArray();
 
         if (!Association || Association.length === 0) {
-            return res.status(404).json({ message: 'No Association details found for the specified client_id' });
+            return res.status(400).json({ message: 'No Association details found for the specified client_id' });
         }
 
         // Return the Association data
@@ -53,7 +52,7 @@ async function FetchAssignedAssociation(req, res) {
 async function FetchChargerDetailsWithSession(req) {
     try {
         const { client_id } = req.body;
-
+        
         // Validate client_id
         if (!client_id) {
             throw new Error('Client ID is required');
@@ -277,43 +276,55 @@ async function FetchUser() {
 async function FetchSpecificUserRoleForSelection() {
     try {
         const db = await database.connectToDatabase();
-        const usersCollection = db.collection("users");
+        const usersCollection = db.collection("user_roles");
 
-       // Use aggregation to fetch users with their roles, filtering for role_id 1 and 2
-        const usersWithRoles = await usersCollection.aggregate([
-                {
-                    $lookup: {
-                        from: 'user_roles',
-                        localField: 'role_id',
-                        foreignField: 'role_id',
-                        as: 'role_details'
-                    }
-                },
-                { $unwind: '$role_details' },
-                {
-                    $match: {
-                        'role_details.role_id': { $in: [3] }
-                    }
-                },
-                {
-                    $project: {
-                        _id: 0,
-                        role_id: '$role_details.role_id',
-                        role_name: '$role_details.role_name'
-                    }
+           // Query to fetch all reseller_id and reseller_name
+           const roles = await usersCollection.find(
+            { role_id: { $in: [2, 3] } }, // Filter to fetch role_id 1 and 2
+            {
+                projection: {
+                    role_id: 1,
+                    role_name: 1,
+                    _id: 0 // Exclude _id from the result
                 }
-            ]).toArray();
+            }
+        ).toArray();
         // Return the users data
-        return usersWithRoles;
+        return roles;
     } catch (error) {
         logger.error(`Error fetching users: ${error}`);
         throw new Error('Error fetching users');
     }
 }
+// FetchClientForSelection
+async function FetchClientForSelection() {
+    try {
+        const db = await database.connectToDatabase();
+        const resellersCollection = db.collection("client_details");
+
+        // Query to fetch all reseller_id and reseller_name
+        const resellers = await resellersCollection.find(
+            {}, // No filter to fetch all resellers
+            {
+                projection: {
+                    client_id: 1,
+                    client_name: 1,
+                    _id: 0 // Exclude _id from the result
+                }
+            }
+        ).toArray();
+
+        // Return the resellers data
+        return resellers;
+    } catch (error) {
+        logger.error(`Error fetching clients: ${error}`);
+        throw new Error('Error fetching clients');
+    }
+}
 // Create User
 async function CreateUser(req, res, next) {
     try {
-        const { role_id, client_id,reseller_id,username, email_id, password, phone_no, created_by } = req.body;
+        const { role_id,reseller_id,client_id,username, email_id, password, phone_no, created_by } = req.body;
 
         // Validate the input
         if (!username || !role_id || !email_id || !password || !created_by || !reseller_id || !client_id) {
@@ -465,15 +476,16 @@ async function DeActivateUser(req, res, next) {
 
 //CHARGER Function
 //FetchAllocatedCharger
-async function FetchAllocatedCharger() {
+async function FetchAllocatedCharger(req) {
     try {
+        const {reseller_id} = req.body;
         const db = await database.connectToDatabase();
         const devicesCollection = db.collection("charger_details");
 
         // Aggregation to fetch chargers with client names
         const chargersWithClients = await devicesCollection.aggregate([
             {
-                $match: { assigned_client_id: { $ne: null } } // Find chargers with assigned clients
+                $match: { assigned_client_id: { $ne: null }, assigned_reseller_id: reseller_id } // Find chargers with assigned clients
             },
             {
                 $lookup: {
@@ -505,12 +517,13 @@ async function FetchAllocatedCharger() {
     }
 }
 //FetchUnAllocatedCharger
-async function FetchUnAllocatedCharger() {
+async function FetchUnAllocatedCharger(req) {
     try {
+        const {reseller_id} = req.body
         const db = await database.connectToDatabase();
         const devicesCollection = db.collection("charger_details");
 
-        const chargers = await devicesCollection.find({ assigned_client_id: null }).toArray();
+        const chargers = await devicesCollection.find({ assigned_client_id: null, assigned_reseller_id: reseller_id  }).toArray();
 
         return chargers; // Only return data, don't send response
     } catch (error) {
@@ -605,14 +618,14 @@ async function AssginChargerToClient(req, res) {
             }
         );
 
-        if (result.modifiedCount === 0) {
+        if (result.modifiedCount === 0) {ß
             throw new Error('Failed to assign chargers to reseller');
         }
 
-        return res.status(200).json({ message: 'Chargers Successfully Assigned' });
+        return res.status(200).json({ status:"Success",message: 'Chargers Successfully Assigned' });
 
     } catch (error) {
-        console.error(error);
+        console.error(error);s
         logger.error(`Error assigning chargers to reseller: ${error}`);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
@@ -797,6 +810,7 @@ module.exports = {
         //MANAGE USER
         FetchUser,
         FetchSpecificUserRoleForSelection,
+        FetchClientForSelection,
         CreateUser,
         UpdateUser,
         DeActivateUser,

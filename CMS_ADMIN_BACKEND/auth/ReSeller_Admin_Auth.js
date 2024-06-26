@@ -33,7 +33,6 @@ const authenticate = async (req, res, next) => {
             user_id: user.user_id,
             reseller_name: getResellerdetails.reseller_name,
             reseller_id: getResellerdetails.reseller_id,
-            client_id: user.client_id,
         };
 
     } catch (error) {

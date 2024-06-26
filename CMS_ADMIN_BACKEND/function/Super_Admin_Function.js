@@ -157,51 +157,63 @@ async function FetchUser() {
         throw new Error('Error fetching users');
     }
 }
-//FetchSpecificUserForSelection
-async function FetchSpecificUserForSelection() {
+//FetchSpecificUserRoleForSelection
+async function FetchSpecificUserRoleForSelection() {
     try {
         const db = await database.connectToDatabase();
-        const usersCollection = db.collection("users");
+        const usersCollection = db.collection("user_roles");
 
-       // Use aggregation to fetch users with their roles, filtering for role_id 1 and 2
-        const usersWithRoles = await usersCollection.aggregate([
-                {
-                    $lookup: {
-                        from: 'user_roles',
-                        localField: 'role_id',
-                        foreignField: 'role_id',
-                        as: 'role_details'
-                    }
-                },
-                { $unwind: '$role_details' },
-                {
-                    $match: {
-                        'role_details.role_id': { $in: [1, 2] }
-                    }
-                },
-                {
-                    $project: {
-                        _id: 0,
-                        role_id: '$role_details.role_id',
-                        role_name: '$role_details.role_name'
-                    }
+           // Query to fetch all reseller_id and reseller_name
+           const roles = await usersCollection.find(
+            { role_id: { $in: [1, 2] } }, // Filter to fetch role_id 1 and 2
+            {
+                projection: {
+                    role_id: 1,
+                    role_name: 1,
+                    _id: 0 // Exclude _id from the result
                 }
-            ]).toArray();
+            }
+        ).toArray();
         // Return the users data
-        return usersWithRoles;
+        return roles;
     } catch (error) {
         logger.error(`Error fetching users: ${error}`);
         throw new Error('Error fetching users');
     }
 }
+// FetchResellerForSelection
+async function FetchResellerForSelection() {
+    try {
+        const db = await database.connectToDatabase();
+        const resellersCollection = db.collection("reseller_details");
+
+        // Query to fetch all reseller_id and reseller_name
+        const resellers = await resellersCollection.find(
+            {}, // No filter to fetch all resellers
+            {
+                projection: {
+                    reseller_id: 1,
+                    reseller_name: 1,
+                    _id: 0 // Exclude _id from the result
+                }
+            }
+        ).toArray();
+
+        // Return the resellers data
+        return resellers;
+    } catch (error) {
+        logger.error(`Error fetching resellers: ${error}`);
+        throw new Error('Error fetching resellers');
+    }
+}
 // Create User
 async function CreateUser(req, res, next) {
     try {
-        const { role_id, username, email_id, password, phone_no, wallet_bal, created_by } = req.body;
+        const { role_id, reseller_id,username, email_id, password, phone_no, wallet_bal, created_by } = req.body;
 
         // Validate the input
-        if (!username || !role_id || !email_id || !password || !created_by) {
-            return res.status(400).json({ message: 'Username, Role ID, Email, Password, and Created By are required' });
+        if (!username || !role_id || !email_id || !password || !created_by || !reseller_id) {
+            return res.status(400).json({ message: 'Username, Role ID, Email, reseller id ,Password, and Created By are required' });
         }
 
         const db = await database.connectToDatabase();
@@ -230,7 +242,7 @@ async function CreateUser(req, res, next) {
         // Insert the new user
         await Users.insertOne({
             role_id: role_id,
-            reseller_id: null, // Default value, adjust if necessary
+            reseller_id: reseller_id, // Default value, adjust if necessary
             client_id: null, // Default value, adjust if necessary
             association_id: null, // Default value, adjust if necessary
             user_id: newUserId,
@@ -935,7 +947,8 @@ module.exports = {
     DeActivateOrActivateUserRole,
     //USER
     FetchUser,
-    FetchSpecificUserForSelection,
+    FetchSpecificUserRoleForSelection,
+    FetchResellerForSelection,
     CreateUser,
     UpdateUser,
     DeActivateUser,

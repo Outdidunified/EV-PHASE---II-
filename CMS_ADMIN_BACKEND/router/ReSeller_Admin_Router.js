@@ -13,7 +13,6 @@ router.post('/CheckLoginCredentials', async (req, res) => {
                 user_id: result.user_id,
                 reseller_id: result.reseller_id,
                 reseller_name: result.reseller_name,
-                client_id: result.client_id,
             }
         });
     } catch (error) {
@@ -24,7 +23,7 @@ router.post('/CheckLoginCredentials', async (req, res) => {
 
 // MANAGE CLIENT Route
 // Route to FetchClients
-router.get('/getAllClients', async (req, res) => {
+router.post('/getAllClients', async (req, res) => {
     try {
         const getresellerClients = await functions.FetchClients(req, res); // Pass req and res to the function
         res.status(200).json({ message: 'Success', data: getresellerClients });
@@ -34,7 +33,7 @@ router.get('/getAllClients', async (req, res) => {
     }
 });
 // Route to FetchAssignedAssociation
-router.get('/FetchAssignedAssociation', async (req, res) => {
+router.post('/FetchAssignedAssociation', async (req, res) => {
     try {
         await functions.FetchAssignedAssociation(req, res);
     } catch (error) {
@@ -43,7 +42,7 @@ router.get('/FetchAssignedAssociation', async (req, res) => {
     }
 });
 // Route to FetchChargerDetailsWithSession
-router.get('/FetchChargerDetailsWithSession', async (req, res) => {
+router.post('/FetchChargerDetailsWithSession', async (req, res) => {
     try {
         const ChargersWithSession = await functions.FetchChargerDetailsWithSession(req);
         
@@ -126,6 +125,18 @@ router.get('/FetchSpecificUserRoleForSelection', async (req, res) => {
         console.error('Error in FetchSpecificUserForCreateSelection route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to FetchSpecificUserForCreateSelection ' });
 }});
+// Route to FetchClientForSelection 
+router.get('/FetchClientForSelection', async (req, res) => {
+    try {
+        // Call FetchUser function to get users data
+        const user = await functions.FetchClientForSelection(req, res);
+        // Send response with users data
+        res.status(200).json({ status: 'Success', data: user });
+        
+    } catch (error) {
+        console.error('Error in FetchClientForSelection route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to FetchClientForSelection ' });
+}});
 // Route to CreateUser
 router.post('/CreateUser', functions.CreateUser, (req, res) => {
     res.status(200).json({ status: 'Success' ,message: 'New user created successfully' });
@@ -142,9 +153,9 @@ router.post('/DeActivateUser', functions.DeActivateUser, (req, res) => {
 
 //MANAGE CHARGER Route
 // Route to FetchUnAllocatedCharger 
-router.get('/FetchUnAllocatedCharger', async (req, res) => {
+router.post('/FetchUnAllocatedCharger', async (req, res) => {
     try {
-        const Chargers = await functions.FetchUnAllocatedCharger();
+        const Chargers = await functions.FetchUnAllocatedCharger(req);
         
         const safeChargers = JSON.parse(JSON.stringify(Chargers));
         
@@ -155,9 +166,9 @@ router.get('/FetchUnAllocatedCharger', async (req, res) => {
     }
 });
 // Route to FetchAllocatedCharger 
-router.get('/FetchAllocatedCharger', async (req, res) => {
+router.post('/FetchAllocatedCharger', async (req, res) => {
     try {
-        const Chargers = await functions.FetchAllocatedCharger();
+        const Chargers = await functions.FetchAllocatedCharger(req);
         
         const safeChargers = JSON.parse(JSON.stringify(Chargers));
         
@@ -185,10 +196,11 @@ router.post('/AssginChargerToClient', async (req, res) => {
 
 //MANAGE WALLET
 //Route to FetchCommissionAmtReseller
-router.get('/FetchCommissionAmtReseller', async (req, res) => {
+router.post('/FetchCommissionAmtReseller', async (req, res) => {
     try {
         const commissionAmt = await functions.FetchCommissionAmtReseller(req, res);
         res.status(200).json({ status: 'Success', commissionAmtOfReseller: commissionAmt });
+
     } catch (error) {
         console.error('Error in FetchCommissionAmtReseller route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to  FetchCommissionAmtReseller' });
@@ -197,7 +209,7 @@ router.get('/FetchCommissionAmtReseller', async (req, res) => {
 
 // PROFILE Route
 // Route to FetchUserProfile 
-router.get('/FetchUserProfile', async (req, res) => {
+router.post('/FetchUserProfile', async (req, res) => {
     try {
         const userdata = await functions.FetchUserProfile(req, res);
         res.status(200).json({ status: 'Success', data: userdata });

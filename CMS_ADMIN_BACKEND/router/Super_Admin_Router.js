@@ -69,17 +69,29 @@ router.get('/FetchUsers', async (req, res) => {
         console.error('Error in FetchUser route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to fetch users' });
 }});
-// Route to FetchSpecificUserForSelection 
-router.get('/FetchSpecificUserForSelectionRoles', async (req, res) => {
+// Route to FetchSpecificUserRoleForSelection 
+router.get('/FetchSpecificUserRoleForSelection', async (req, res) => {
     try {
         // Call FetchUser function to get users data
-        const user = await functions.FetchSpecificUserForSelection(req, res);
+        const user = await functions.FetchSpecificUserRoleForSelection(req, res);
         // Send response with users data
         res.status(200).json({ status: 'Success', data: user });
         
     } catch (error) {
-        console.error('Error in FetchSpecificUserForCreateSelection route:', error);
-        res.status(500).json({ status: 'Failed', message: 'Failed to FetchSpecificUserForCreateSelection ' });
+        console.error('Error in FetchSpecificUserRoleForSelection route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to FetchSpecificUserRoleForSelection ' });
+}});
+// Route to FetchResellerForSelection 
+router.get('/FetchResellerForSelection', async (req, res) => {
+    try {
+        // Call FetchUser function to get users data
+        const user = await functions.FetchResellerForSelection(req, res);
+        // Send response with users data
+        res.status(200).json({ status: 'Success', data: user });
+        
+    } catch (error) {
+        console.error('Error in FetchResellerForSelection route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to FetchResellerForSelection ' });
 }});
 // Route to CreateUser
 router.post('/CreateUser', functions.CreateUser, (req, res) => {
@@ -234,4 +246,6 @@ router.post('/AssginChargerToReseller', async (req, res) => {
         res.status(500).json({ message: 'Failed to AssginChargerToReseller' });
     }
 });
+
+
 module.exports = router;

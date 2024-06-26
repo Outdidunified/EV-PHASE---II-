@@ -19,6 +19,81 @@ async function FetchAssociationUser(req, res) {
         throw new Error('Error fetching client details');
     }
 }
+//FetchChargerDetailsWithSession
+async function FetchChargerDetailsWithSession(req) {
+    try {
+        const { association_id } = req.body;
+
+        // Validate client_id
+        if (!association_id) {
+            throw new Error('Association ID is required');
+        }
+
+        const db = await database.connectToDatabase();
+        const chargerCollection = db.collection("charger_details");
+
+        // Aggregation pipeline to fetch charger details with sorted session data
+        const result = await chargerCollection.aggregate([
+            {
+                $match: { assigned_association_id: association_id }
+            },
+            {
+                $lookup: {
+                    from: "device_session_details",
+                    localField: "charger_id",
+                    foreignField: "charger_id",
+                    as: "sessions"
+                }
+            },
+            {
+                $addFields: {
+                    chargerID: "$charger_id",
+                    sessiondata: {
+                        $cond: {
+                            if: { $gt: [{ $size: "$sessions" }, 0] },
+                            then: {
+                                $map: {
+                                    input: {
+                                        $sortArray: {
+                                            input: "$sessions",
+                                            sortBy: { stop_time: -1 }
+                                        }
+                                    },
+                                    as: "session",
+                                    in: "$$session"
+                                }
+                            },
+                            else: ["No session found"]
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    chargerID: 1,
+                    sessiondata: 1
+                }
+            }
+        ]).toArray();
+        if (!result || result.length === 0) {
+            throw new Error('No chargers found for the specified AssociationID');
+        }
+
+        // Sort sessiondata within each chargerID based on the first session's stop_time
+        result.forEach(charger => {
+            if (charger.sessiondata.length > 1) {
+                charger.sessiondata.sort((a, b) => new Date(b.stop_time) - new Date(a.stop_time));
+            }
+        });
+
+        return result;
+
+    } catch (error) {
+        console.error(`Error fetching charger details: ${error.message}`);
+        throw error;
+    }
+}
 //CreateAssociationUser
 async function CreateAssociationUser(req, res, next) {
     try {
@@ -325,28 +400,54 @@ async function UpdateClientProfile(req, res, next) {
 
 //CHARGER Function
 //FetchAllocatedCharger
-async function FetchAllocatedCharger() {
+async function FetchAllocatedCharger(req) {
     try {
+        const {client_id} = req.body;
         const db = await database.connectToDatabase();
         const devicesCollection = db.collection("charger_details");
 
-        // Query to fetch chargers where assigned_reseller_id is null
-        const chargers = await devicesCollection.find({ assigned_client_id: { $ne: null } }).toArray();
+        // Aggregation to fetch chargers with client names
+        const chargersWithClients = await devicesCollection.aggregate([
+            {
+                $match: { assigned_association_id: { $ne: null }, assigned_client_id: client_id } // Find chargers with assigned clients
+            },
+            {
+                $lookup: {
+                    from: 'client_details', // Collection name for client details
+                    localField: 'assigned_client_id',
+                    foreignField: 'client_id', // Assuming client_id is the field name in client_details
+                    as: 'clientDetails'
+                }
+            },
+            {
+                $unwind: '$clientDetails' // Unwind the array to include client details as an object
+            },
+            {
+                $addFields: {
+                    client_name: '$clientDetails.client_name' // Include the client name in the result
+                }
+            },
+            {
+                $project: {
+                    clientDetails: 0 // Exclude the full clientDetails object
+                }
+            }
+        ]).toArray();
 
-        return chargers; // Only return data, don't send response
+        return chargersWithClients; // Only return data, don't send response
     } catch (error) {
         console.error(`Error fetching chargers: ${error}`);
         throw new Error('Failed to fetch chargers'); // Throw error, handle in route
     }
 }
 //FetchUnAllocatedCharger
-async function FetchUnAllocatedCharger() {
+async function FetchUnAllocatedCharger(req) {
     try {
+        const {client_id} = req.body
         const db = await database.connectToDatabase();
         const devicesCollection = db.collection("charger_details");
 
-        // Query to fetch chargers where assigned_reseller_id is null
-        const chargers = await devicesCollection.find({ assigned_association_id: null }).toArray();
+        const chargers = await devicesCollection.find({ assigned_association_id: null, assigned_client_id: client_id  }).toArray();
 
         return chargers; // Only return data, don't send response
     } catch (error) {
@@ -418,47 +519,59 @@ async function FetchUser() {
 async function FetchSpecificUserRoleForSelection() {
     try {
         const db = await database.connectToDatabase();
-        const usersCollection = db.collection("users");
+        const usersCollection = db.collection("user_roles");
 
-       // Use aggregation to fetch users with their roles, filtering for role_id 1 and 2
-        const usersWithRoles = await usersCollection.aggregate([
-                {
-                    $lookup: {
-                        from: 'user_roles',
-                        localField: 'role_id',
-                        foreignField: 'role_id',
-                        as: 'role_details'
-                    }
-                },
-                { $unwind: '$role_details' },
-                {
-                    $match: {
-                        'role_details.role_id': { $in: [4] }
-                    }
-                },
-                {
-                    $project: {
-                        _id: 0,
-                        role_id: '$role_details.role_id',
-                        role_name: '$role_details.role_name'
-                    }
-                }
-            ]).toArray();
+        // Query to fetch all reseller_id and reseller_name
+        const roles = await usersCollection.find(
+        { role_id: { $in: [3, 4] } }, // Filter to fetch role_id 1 and 2
+        {
+            projection: {
+                role_id: 1,
+                role_name: 1,
+                _id: 0 // Exclude _id from the result
+            }
+        }
+        ).toArray();
         // Return the users data
-        return usersWithRoles;
+        return roles;
     } catch (error) {
         logger.error(`Error fetching users: ${error}`);
         throw new Error('Error fetching users');
     }
 }
+// FetchAssociationForSelection
+async function FetchAssociationForSelection() {
+    try {
+        const db = await database.connectToDatabase();
+        const resellersCollection = db.collection("association_details");
+
+        // Query to fetch all reseller_id and reseller_name
+        const resellers = await resellersCollection.find(
+            {}, // No filter to fetch all resellers
+            {
+                projection: {
+                    association_id: 1,
+                    association_name: 1,
+                    _id: 0 // Exclude _id from the result
+                }
+            }
+        ).toArray();
+
+        // Return the resellers data
+        return resellers;
+    } catch (error) {
+        logger.error(`Error fetching associations: ${error}`);
+        throw new Error('Error fetching associations');
+    }
+}
 //CreateUser
 async function CreateUser(req, res, next) {
     try {
-        const { role_id, username, email_id, password, phone_no, wallet_bal, created_by } = req.body;
+        const { role_id, reseller_id, client_id, association_id,username, email_id, password, phone_no, created_by } = req.body;
 
         // Validate the input
-        if (!username || !role_id || !email_id || !password || !created_by) {
-            return res.status(400).json({ message: 'Username, Role ID, Email, Password, and Created By are required' });
+        if (!username || !role_id || !email_id || !password || !created_by || !reseller_id || !client_id || !association_id) {
+            return res.status(400).json({ message: 'Username, Role ID, Email, Password, Created By, Reseller ID, Client ID, and Association ID are required' });
         }
 
         const db = await database.connectToDatabase();
@@ -487,9 +600,9 @@ async function CreateUser(req, res, next) {
         // Insert the new user
         await Users.insertOne({
             role_id: role_id,
-            reseller_id: null, // Default value, adjust if necessary
-            client_id: null, // Default value, adjust if necessary
-            association_id: null, // Default value, adjust if necessary
+            reseller_id: reseller_id, // Default value, adjust if necessary
+            client_id: client_id, // Default value, adjust if necessary
+            association_id: association_id, // Default value, adjust if necessary
             user_id: newUserId,
             username: username,
             email_id: email_id,
@@ -605,16 +718,273 @@ async function DeActivateUser(req, res, next) {
     }
 }
 
+// WALLET Functions
+//FetchCommissionAmtClient
+async function FetchCommissionAmtClient(req, res) {
+    const { user_id } = req.body;
+    try {
+        const db = await database.connectToDatabase();
+        const usersCollection = db.collection("users");
+        
+        // Fetch the user with the specified user_id
+        const user = await usersCollection.findOne({ user_id: user_id });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Extract wallet balance from user object
+        const walletBalance = user.wallet_bal;
+
+        return walletBalance;
+
+    } catch (error) {
+        console.error(`Error fetching wallet balance: ${error}`);
+        logger.error(`Error fetching wallet balance: ${error}`);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
+//MANAGE FINANCE
+//FetchFinanceDetails
+async function FetchFinanceDetails() {
+    try {
+        const db = await database.connectToDatabase();
+        const Collection = db.collection("finance_details");
+        
+        const financeDetails = await Collection.find().toArray();
+
+        // Return the financeDetails data
+        return financeDetails;
+    } catch (error) {
+        logger.error(`Error fetching users by role_id: ${error}`);
+        throw new Error('Error fetching users by role_id');
+    }
+}
+//CreateFinanceDetails
+async function CreateFinanceDetails(req, res, next) {
+    try {
+        const {
+            association_id,
+            client_id,
+            eb_charges,
+            app_charges,
+            other_charges,
+            parking_charges,
+            rent_charges,
+            open_a_eb_charges,
+            open_other_charges,
+            created_by
+        } = req.body;
+
+        // Validate required fields
+        if (!association_id || !client_id || !eb_charges || !app_charges || !other_charges || !parking_charges || !rent_charges || !open_a_eb_charges || !open_other_charges || !created_by) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const financeCollection = db.collection("finance_details");
+
+        // Use aggregation to fetch the highest finance_id
+        const lastFinance = await financeCollection.find().sort({ finance_id: -1 }).limit(1).toArray();
+        let newFinanceId = 1; // Default finance_id if no finance details exist
+        if (lastFinance.length > 0) {
+            newFinanceId = lastFinance[0].finance_id + 1;
+        }
+
+        // Insert the new finance detail
+        const result = await financeCollection.insertOne({
+            finance_id: newFinanceId,
+            association_id,
+            client_id,
+            eb_charges,
+            app_charges,
+            other_charges,
+            parking_charges,
+            rent_charges,
+            open_a_eb_charges,
+            open_other_charges,
+            created_date: new Date(),
+            modified_date: null,
+            created_by,
+            modified_by: null,
+            status: true
+        });
+
+        if (result.acknowledged) {
+            next();
+        } else {
+            return res.status(500).json({ message: 'Failed to create finance detail' });
+        }
+
+    } catch (error) {
+        console.error(error);
+        logger.error(`Error creating finance detail: ${error}`);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+//UpdateFinanceDetails
+async function UpdateFinanceDetails(req, res, next) {
+    try {
+        const {
+            finance_id,
+            association_id,
+            client_id,
+            eb_charges,
+            app_charges,
+            other_charges,
+            parking_charges,
+            rent_charges,
+            open_a_eb_charges,
+            open_other_charges,
+            modified_by
+        } = req.body;
+
+        // Validate required fields
+        if (!finance_id || !association_id || !client_id || !eb_charges || !app_charges || !other_charges || !parking_charges || !rent_charges || !open_a_eb_charges || !open_other_charges || !modified_by) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const financeCollection = db.collection("finance_details");
+
+        // Check if the finance_id exists
+        const existingFinance = await financeCollection.findOne({ finance_id: finance_id });
+        if (!existingFinance) {
+            return res.status(404).json({ message: 'Finance with this ID does not exist' });
+        }
+
+        // Update the finance detail
+        const result = await financeCollection.updateOne(
+            { finance_id: finance_id },
+            {
+                $set: {
+                    association_id,
+                    client_id,
+                    eb_charges,
+                    app_charges,
+                    other_charges,
+                    parking_charges,
+                    rent_charges,
+                    open_a_eb_charges,
+                    open_other_charges,
+                    modified_date: new Date(),
+                    modified_by
+                }
+            }
+        );
+
+        if (result.modifiedCount === 1) {
+            next();
+        } else {
+            return res.status(500).json({ message: 'Failed to update finance detail' });
+        }
+
+    } catch (error) {
+        console.error(error);
+        logger.error(`Error updating finance detail: ${error}`);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+//DeactivateOrActivateFinanceDetails
+async function DeactivateOrActivateFinanceDetails(req, res, next) {
+    try {
+        const { finance_id, status, modified_by } = req.body;
+
+        // Validate required fields
+        if (!finance_id || typeof status !== 'boolean' || !modified_by) {
+            return res.status(400).json({ message: 'Finance ID, Status, and Modified By are required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const financeCollection = db.collection("finance_details");
+
+        // Check if the finance_id exists
+        const existingFinance = await financeCollection.findOne({ finance_id: finance_id });
+        if (!existingFinance) {
+            return res.status(404).json({ message: 'Finance with this ID does not exist' });
+        }
+
+        // Update the status of the finance detail
+        const result = await financeCollection.updateOne(
+            { finance_id: finance_id },
+            {
+                $set: {
+                    status,
+                    modified_date: new Date(),
+                    modified_by
+                }
+            }
+        );
+
+        if (result.modifiedCount === 1) {
+            next()
+        } else {
+            return res.status(500).json({ message: 'Failed to update finance detail' });
+        }
+
+    } catch (error) {
+        console.error(error);
+        logger.error(`Error updating finance detail: ${error}`);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
+// ASSIGN FINANCE TO CHARGER
+async function AssignFinanceToCharger(req, res, next) {
+    try {
+        const { charger_id, finance_id , modified_by} = req.body;
+
+        // Validate required fields
+        if (!charger_id || !finance_id || !modified_by) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const chargerCollection = db.collection("charger_details");
+
+        // Check if the charger_id exists
+        const existingCharger = await chargerCollection.findOne({ charger_id: charger_id });
+        if (!existingCharger) {
+            return res.status(404).json({ message: 'Charger with this ID does not exist' });
+        }
+
+        const result = await chargerCollection.updateOne(
+            { charger_id: charger_id },
+            {
+                $set: {
+                    finance_id,
+                    modified_date: new Date(),
+                    modified_by
+                }
+            }
+        );
+
+        if (result.modifiedCount === 1) {
+            next();
+        } else {
+            return res.status(500).json({ message: 'Failed to update finance in charger' });
+        }
+
+    } catch (error) {
+        console.error(error);
+        logger.error(`Error updating finance in charger: ${error}`);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
 
 module.exports = { 
     //MANAGE USER
     FetchUser,
     FetchSpecificUserRoleForSelection,
+    FetchAssociationForSelection,
     CreateUser,
     UpdateUser,
     DeActivateUser,
     // MANAGE ASSOCIATION
     FetchAssociationUser,
+    FetchChargerDetailsWithSession,
     CreateAssociationUser,
     UpdateAssociationUser,
     DeActivateOrActivateAssociationUser,
@@ -626,4 +996,13 @@ module.exports = {
     FetchUnAllocatedCharger,
     FetchAllocatedCharger,
     DeActivateOrActivateCharger,
+    //MANAGE WALLET
+    FetchCommissionAmtClient,
+    //MANAGE FINANCE
+    FetchFinanceDetails,
+    CreateFinanceDetails,
+    UpdateFinanceDetails,
+    DeactivateOrActivateFinanceDetails,
+    //ASSGIN FINANCE TO CHARGER
+    AssignFinanceToCharger,
 };
