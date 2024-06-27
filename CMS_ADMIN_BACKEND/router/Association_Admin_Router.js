@@ -116,7 +116,7 @@ router.post('/DeActivateOrActivateCharger', functions.DeActivateOrActivateCharge
 router.get('/FetchCommissionAmtAssociation', async (req, res) => {
     try {
         const commissionAmt = await functions.FetchCommissionAmtAssociation(req, res);
-        res.status(200).json({ status: 'Success', commissionAmtOfAssociation: commissionAmt });
+        res.status(200).json({ status: 'Success', data: commissionAmt });
     } catch (error) {
         console.error('Error in FetchCommissionAmtAssociation route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to  FetchCommissionAmtAssociation' });

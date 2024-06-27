@@ -199,7 +199,7 @@ router.post('/AssginChargerToClient', async (req, res) => {
 router.post('/FetchCommissionAmtReseller', async (req, res) => {
     try {
         const commissionAmt = await functions.FetchCommissionAmtReseller(req, res);
-        res.status(200).json({ status: 'Success', commissionAmtOfReseller: commissionAmt });
+        res.status(200).json({ status: 'Success', data: commissionAmt });
 
     } catch (error) {
         console.error('Error in FetchCommissionAmtReseller route:', error);
