@@ -2,7 +2,7 @@ const database = require('../db');
 const logger = require('../logger');
 
 
-//RESELLER Function
+//CLIENTS Function
 //FetchClients
 async function FetchClients(req, res) {
     try {
