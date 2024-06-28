@@ -24,7 +24,7 @@ router.post('/CheckLoginCredentials', async (req, res) => {
 
 // PROFILE Route
 // Route to FetchUserProfile 
-router.get('/FetchUserProfile', async (req, res) => {
+router.post('/FetchUserProfile', async (req, res) => {
     try {
         const userdata = await functions.FetchUserProfile(req, res);
         res.status(200).json({ status: 'Success', data: userdata });
@@ -182,7 +182,7 @@ router.post('/DeActivateOrActivateCharger', functions.DeActivateOrActivateCharge
 
 //MANAGE WALLET
 //Route to FetchCommissionAmtClient
-router.get('/FetchCommissionAmtClient', async (req, res) => {
+router.post('/FetchCommissionAmtClient', async (req, res) => {
     try {
         const commissionAmt = await functions.FetchCommissionAmtClient(req, res);
         res.status(200).json({ status: 'Success', data: commissionAmt });

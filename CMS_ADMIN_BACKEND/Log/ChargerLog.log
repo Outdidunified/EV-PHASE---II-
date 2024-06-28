@@ -1027,3 +1027,25 @@
 27/06/2024 14:45:21 [INFO]: HTTP Server listening on port 4000
 27/06/2024 14:47:47 [INFO]: HTTP Server listening on port 4000
 27/06/2024 14:48:00 [INFO]: HTTP Server listening on port 4000
+27/06/2024 15:12:14 [INFO]: HTTP Server listening on port 4000
+27/06/2024 16:29:16 [INFO]: HTTP Server listening on port 4000
+27/06/2024 16:29:36 [INFO]: HTTP Server listening on port 4000
+27/06/2024 16:31:34 [INFO]: HTTP Server listening on port 4000
+27/06/2024 16:31:56 [INFO]: HTTP Server listening on port 4000
+27/06/2024 16:36:54 [INFO]: HTTP Server listening on port 4000
+27/06/2024 18:07:09 [INFO]: HTTP Server listening on port 4000
+27/06/2024 18:12:01 [INFO]: HTTP Server listening on port 4000
+27/06/2024 18:12:05 [INFO]: HTTP Server listening on port 4000
+27/06/2024 18:12:15 [INFO]: HTTP Server listening on port 4000
+27/06/2024 18:12:22 [INFO]: HTTP Server listening on port 4000
+27/06/2024 18:17:55 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+27/06/2024 18:17:55 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+27/06/2024 18:42:48 [INFO]: HTTP Server listening on port 4000
+28/06/2024 10:19:53 [INFO]: HTTP Server listening on port 4000
+28/06/2024 10:43:08 [INFO]: HTTP Server listening on port 4000
+28/06/2024 11:52:13 [INFO]: HTTP Server listening on port 4000
+28/06/2024 11:54:38 [INFO]: HTTP Server listening on port 4000
+28/06/2024 12:09:03 [INFO]: HTTP Server listening on port 4000
+28/06/2024 15:01:16 [INFO]: HTTP Server listening on port 4000
+28/06/2024 15:13:33 [INFO]: HTTP Server listening on port 4000
+28/06/2024 15:24:42 [INFO]: HTTP Server listening on port 4000

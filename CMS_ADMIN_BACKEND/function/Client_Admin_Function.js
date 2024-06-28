@@ -283,6 +283,7 @@ async function FetchUserProfile(req, res) {
                     username: 1,
                     email_id: 1,
                     phone_no: 1,
+                    password:1,
                     wallet_bal: 1,
                     autostop_time: 1,
                     autostop_unit: 1,
