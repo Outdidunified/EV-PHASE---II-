@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Auth = require("../auth/Super_Admin_Auth.js")
 const functions = require("../function/Super_Admin_Function.js")
+const flatted = require('flatted'); // Add this at the top of your file
 
 // Route to check login credentials
 router.post('/CheckLoginCredentials', async (req, res) => {
@@ -108,7 +109,7 @@ router.post('/DeActivateUser', functions.DeActivateUser, (req, res) => {
 
 // PROFILE Route
 // Route to FetchUserProfile 
-router.get('/FetchUserProfile', async (req, res) => {
+router.post('/FetchUserProfile', async (req, res) => {
     try {
         const userdata = await functions.FetchUserProfile(req, res);
         res.status(200).json({ status: 'Success', data: userdata });
@@ -177,7 +178,7 @@ router.get('/FetchResellers', async (req, res) => {
     }
 });
 // Route to FetchAssignedClients
-router.get('/FetchAssignedClients', async (req, res) => {
+router.post('/FetchAssignedClients', async (req, res) => {
     try {
         await functions.FetchAssignedClients(req, res);
     } catch (error) {
@@ -186,17 +187,17 @@ router.get('/FetchAssignedClients', async (req, res) => {
     }
 });
 // Route to FetchChargerDetailsWithSession
-router.get('/FetchChargerDetailsWithSession', async (req, res) => {
+router.post('/FetchChargerDetailsWithSession', async (req, res) => {
     try {
-        const ChargersWithSession = await functions.FetchChargerDetailsWithSession(req,res);
-        
-        // Filter out any circular references (optional, only if necessary)
-        const Chargers = JSON.parse(JSON.stringify(ChargersWithSession));
+        const ChargersWithSession = await functions.FetchChargerDetailsWithSession(req);
+
+        // Filter out any circular references
+        const Chargers = flatted.parse(flatted.stringify(ChargersWithSession));
         
         res.status(200).json({ status: 'Success', data: Chargers });
     } catch (error) {
-        console.error('Error in FetchAssignedClients route:', error);
-        res.status(500).json({ status: 'Failed', message: 'Failed to FetchAssignedClients' });
+        console.error('Error in FetchChargerDetailsWithSession route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to FetchChargerDetailsWithSession' });
     }
 });
 // Route to create a new reseller

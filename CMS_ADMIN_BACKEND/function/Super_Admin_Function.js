@@ -629,7 +629,6 @@ async function FetchResellers(req, res) {
 async function FetchAssignedClients(req, res) {
     try {
         const { reseller_id } = req.body;
-
         // Validate reseller_id
         if (!reseller_id) {
             return res.status(400).json({ message: 'Reseller ID is required' });
@@ -654,14 +653,14 @@ async function FetchAssignedClients(req, res) {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 }
-//FetchChargerDetailsWithSession
-async function FetchChargerDetailsWithSession(req, res) {
+// FetchChargerDetailsWithSession
+async function FetchChargerDetailsWithSession(req) {
     try {
         const { reseller_id } = req.body;
 
         // Validate reseller_id
         if (!reseller_id) {
-            return res.status(400).json({ message: 'Reseller ID is required' });
+            throw new Error('Reseller ID is required');
         }
 
         const db = await database.connectToDatabase();
@@ -713,7 +712,7 @@ async function FetchChargerDetailsWithSession(req, res) {
         ]).toArray();
 
         if (!result || result.length === 0) {
-            return res.status(404).json({ message: 'No chargers found for the specified reseller_id' });
+            throw new Error('No chargers found for the specified reseller_id');
         }
 
         // Sort sessiondata within each chargerID based on the first session's stop_time
@@ -727,10 +726,11 @@ async function FetchChargerDetailsWithSession(req, res) {
 
     } catch (error) {
         console.error(error);
-        logger.error(`Error fetching charger details: ${error}`);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        logger.error(`Error fetching charger details: ${error.message}`);
+        throw error;
     }
 }
+
 // CreateReseller 
 async function CreateReseller(req, res) {
     try {

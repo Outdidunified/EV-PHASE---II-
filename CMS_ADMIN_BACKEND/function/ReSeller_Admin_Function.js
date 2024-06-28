@@ -131,7 +131,6 @@ async function addNewClient(req){
         const modified_by = null;
         const modified_date = null;
         const status = true;
-        console.log(reseller_id,client_name,client_phone_no,client_email_id,client_address,created_by)
         const db = await database.connectToDatabase();
         const clientCollection = db.collection("client_details");
 
