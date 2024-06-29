@@ -194,7 +194,7 @@ router.post('/FetchCommissionAmtClient', async (req, res) => {
 
 //MANAGE FINANCE
 // Route to FetchFinanceDetails
-router.post('/FetchFinanceDetails', async (req, res) => {
+router.get('/FetchFinanceDetails', async (req, res) => {
     try {
         const data = await functions.FetchFinanceDetails(req, res);
         res.status(200).json({ status: 'Success', data: data });
@@ -223,7 +223,7 @@ router.post('/AssignFinanceToCharger', functions.AssignFinanceToCharger, (req, r
     res.status(200).json({ status: 'Success' ,message:  'Finance Assigned successfully' });
 });
 // Route to FetchFinanceDetailsForSelection
-router.post('/FetchFinanceDetailsForSelection', async (req, res) => {
+router.get('/FetchFinanceDetailsForSelection', async (req, res) => {
     try {
         const data = await functions.FetchFinanceDetails(req, res);
         res.status(200).json({ status: 'Success', data: data });
@@ -234,5 +234,16 @@ router.post('/FetchFinanceDetailsForSelection', async (req, res) => {
     }
 });
 
+
+//ASSIGN TO ASSOCIATION
+// Route to AssginChargerToAssociation
+router.post('/AssginChargerToAssociation', async (req, res) => {
+    try {
+        await functions.AssginChargerToAssociation(req, res);
+    } catch (error) {
+        console.error('Error in AssginChargerToClient route:', error); 
+        res.status(500).json({ message: 'Failed to AssginChargerToClient' });
+    }
+});
 
 module.exports = router;

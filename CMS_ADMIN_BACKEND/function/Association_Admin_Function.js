@@ -30,6 +30,7 @@ async function FetchUserProfile(req, res) {
                     email_id: 1,
                     phone_no: 1,
                     wallet_bal: 1,
+                    password:1,
                     autostop_time: 1,
                     autostop_unit: 1,
                     autostop_price: 1,

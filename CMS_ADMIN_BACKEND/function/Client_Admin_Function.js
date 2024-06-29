@@ -19,12 +19,12 @@ async function FetchAssociationUser(req, res) {
         throw new Error('Error fetching client details');
     }
 }
-//FetchChargerDetailsWithSession
+// FetchChargerDetailsWithSession
 async function FetchChargerDetailsWithSession(req) {
     try {
         const { association_id } = req.body;
 
-        // Validate client_id
+        // Validate association_id
         if (!association_id) {
             throw new Error('Association ID is required');
         }
@@ -47,7 +47,6 @@ async function FetchChargerDetailsWithSession(req) {
             },
             {
                 $addFields: {
-                    chargerID: "$charger_id",
                     sessiondata: {
                         $cond: {
                             if: { $gt: [{ $size: "$sessions" }, 0] },
@@ -71,13 +70,16 @@ async function FetchChargerDetailsWithSession(req) {
             {
                 $project: {
                     _id: 0,
-                    chargerID: 1,
+                    charger_id: 1,
+                    assigned_association_id: 1,
+                    finance_id: 1,              
                     sessiondata: 1
                 }
             }
         ]).toArray();
+
         if (!result || result.length === 0) {
-            throw new Error('No chargers found for the specified AssociationID');
+            throw new Error('No chargers found for the specified Association ID');
         }
 
         // Sort sessiondata within each chargerID based on the first session's stop_time
@@ -94,6 +96,8 @@ async function FetchChargerDetailsWithSession(req) {
         throw error;
     }
 }
+
+
 //CreateAssociationUser
 async function CreateAssociationUser(req, res, next) {
     try {
@@ -975,6 +979,57 @@ async function AssignFinanceToCharger(req, res, next) {
 }
 
 
+//ASSIGN_CHARGER_TO_ASSOCIATION
+//AssginChargerToAssociation
+async function AssginChargerToAssociation(req, res) {
+    try {
+        const { association_id, charger_id, modified_by} = req.body;
+
+
+        // Validate required fields
+        if (!association_id || !charger_id || !modified_by ) {
+            return res.status(400).json({ message: 'Association ID, Charger IDs and Modified By are required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const devicesCollection = db.collection("charger_details");
+
+        // Ensure charger_ids is an array
+        let chargerIdsArray = Array.isArray(charger_id) ? charger_id : [charger_id];
+
+        // Check if all the chargers exist
+        const existingChargers = await devicesCollection.find({ charger_id: { $in: chargerIdsArray } }).toArray();
+
+        if (existingChargers.length !== chargerIdsArray.length) {
+            return res.status(404).json({ message: 'One or more chargers not found' });
+        }
+
+        // Update the reseller details for all chargers
+        const result = await devicesCollection.updateMany(
+            { charger_id: { $in: chargerIdsArray } },
+            {
+                $set: {
+                    assigned_association_id: association_id,
+                    assigned_association_date: new Date(),
+                    modified_date: new Date(),
+                    modified_by
+                }
+            }
+        );
+
+        if (result.modifiedCount === 0) {ß
+            throw new Error('Failed to assign chargers to reseller');
+        }
+
+        return res.status(200).json({ status:"Success",message: 'Chargers Successfully Assigned' });
+
+    } catch (error) {
+        console.error(error);s
+        logger.error(`Error assigning chargers to reseller: ${error}`);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
 module.exports = { 
     //MANAGE USER
     FetchUser,
@@ -1006,4 +1061,6 @@ module.exports = {
     DeactivateOrActivateFinanceDetails,
     //ASSGIN FINANCE TO CHARGER
     AssignFinanceToCharger,
+    //ASSGIN FINANCE TO CHARGER
+    AssginChargerToAssociation,
 };
