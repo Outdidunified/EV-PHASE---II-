@@ -7,15 +7,14 @@ const functions = require("../function/Association_Admin_Function.js")
 router.post('/CheckLoginCredentials', async (req, res) => {
     try {
         const result = await Auth.authenticate(req);
+
+        if (result.status !== 200) {
+            return res.status(result.status).json({ message: result.message });
+        }
+
         res.status(200).json({
-            message: 'Success',
-            data: {
-                user_id: result.user_id,
-                reseller_id: result.reseller_id,
-                client_id: result.client_id,
-                association_id: result.association_id,
-                association_name: result.association_name,
-            }
+            status: 'Success',
+            data: result.data
         });
     } catch (error) {
         console.error('Error in CheckLoginCredentials route:', error);
