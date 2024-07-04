@@ -772,7 +772,6 @@ async function FetchFinanceDetails() {
 async function CreateFinanceDetails(req, res, next) {
     try {
         const {
-            association_id,
             client_id,
             eb_charges,
             app_charges,
@@ -785,7 +784,7 @@ async function CreateFinanceDetails(req, res, next) {
         } = req.body;
 
         // Validate required fields
-        if (!association_id || !client_id || !eb_charges || !app_charges || !other_charges || !parking_charges || !rent_charges || !open_a_eb_charges || !open_other_charges || !created_by) {
+        if (!client_id || !eb_charges || !app_charges || !other_charges || !parking_charges || !rent_charges || !open_a_eb_charges || !open_other_charges || !created_by) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
@@ -802,7 +801,6 @@ async function CreateFinanceDetails(req, res, next) {
         // Insert the new finance detail
         const result = await financeCollection.insertOne({
             finance_id: newFinanceId,
-            association_id,
             client_id,
             eb_charges,
             app_charges,
