@@ -7,14 +7,14 @@ const functions = require("../function/Client_Admin_Function.js")
 router.post('/CheckLoginCredentials', async (req, res) => {
     try {
         const result = await Auth.authenticate(req);
+
+        if (result.status !== 200) {
+            return res.status(result.status).json({ message: result.message });
+        }
+
         res.status(200).json({
-            message: 'Success',
-            data: {
-                user_id: result.user_id,
-                reseller_id: result.reseller_id,
-                client_id: result.client_id,
-                client_name: result.client_name,
-            }
+            status: 'Success',
+            data: result.data
         });
     } catch (error) {
         console.error('Error in CheckLoginCredentials route:', error);
@@ -236,6 +236,31 @@ router.get('/FetchFinanceDetailsForSelection', async (req, res) => {
 
 
 //ASSIGN TO ASSOCIATION
+// Route to FetchAssociationUserToAssginCharger
+router.post('/FetchAssociationUserToAssginCharger', async (req, res) => {
+    try {
+        // Call FetchUser function to get users data
+        const user = await functions.FetchAssociationUserToAssginCharger(req, res);
+        // Send response with users data
+        res.status(200).json({ status: 'Success', data: user });
+        
+    } catch (error) {
+        console.error('Error in FetchAssociationUserToAssginCharger route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to fetch users' });
+}});
+// Route to FetchUnAllocatedChargerToAssgin 
+router.post('/FetchUnAllocatedChargerToAssgin', async (req, res) => {
+    try {
+        const Chargers = await functions.FetchUnAllocatedChargerToAssgin(req);
+        
+        const safeChargers = JSON.parse(JSON.stringify(Chargers));
+        
+        res.status(200).json({ status: 'Success', data: safeChargers });
+    } catch (error) {
+        console.error('Error in FetchUnAllocatedChargerToAssgin route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to FetchUnAllocatedChargerToAssgin' });
+    }
+});
 // Route to AssginChargerToAssociation
 router.post('/AssginChargerToAssociation', async (req, res) => {
     try {

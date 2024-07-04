@@ -77,6 +77,7 @@ async function FetchChargerDetailsWithSession(req) {
             {
                 $addFields: {
                     chargerID: "$charger_id",
+                    reseller_commission: "$reseller_commission",
                     sessiondata: {
                         $cond: {
                             if: { $gt: [{ $size: "$sessions" }, 0] },
@@ -101,7 +102,9 @@ async function FetchChargerDetailsWithSession(req) {
                 $project: {
                     _id: 0,
                     chargerID: 1,
-                    sessiondata: 1
+                    sessiondata: 1,
+                    reseller_commission: 1,
+
                 }
             }
         ]).toArray();
@@ -279,7 +282,7 @@ async function FetchSpecificUserRoleForSelection() {
 
            // Query to fetch all reseller_id and reseller_name
            const roles = await usersCollection.find(
-            { role_id: { $in: [2, 3] } }, // Filter to fetch role_id 1 and 2
+            { role_id: { $in: [3] } }, // Filter to fetch role_id 1 and 2
             {
                 projection: {
                     role_id: 1,
@@ -579,6 +582,38 @@ async function DeActivateOrActivateCharger(req, res, next) {
 }
 
 //ASSIGN_CHARGER_TO_CLIENT
+//FetchClientUserToAssginCharger
+async function FetchClientUserToAssginCharger(req, res) {
+    try {
+        const { reseller_id } = req.body; 
+        const db = await database.connectToDatabase();
+        const resellersCollection = db.collection("client_details");
+
+        const users = await resellersCollection.find({ reseller_id: parseInt(reseller_id) , status: true}).toArray();
+
+        return users;
+
+    } catch (error) {
+        console.error(`Error fetching client details: ${error}`);
+        logger.error(`Error fetching client details: ${error}`);
+        throw new Error('Error fetching client details');
+    }
+}
+//FetchUnAllocatedChargerToAssgin
+async function FetchUnAllocatedChargerToAssgin(req) {
+    try {
+        const {client_id} = req.body
+        const db = await database.connectToDatabase();
+        const devicesCollection = db.collection("charger_details");
+
+        const chargers = await devicesCollection.find({ assigned_association_id: null, assigned_client_id: client_id , status:true }).toArray();
+
+        return chargers; // Only return data, don't send response
+    } catch (error) {
+        console.error(`Error fetching chargers: ${error}`);
+        throw new Error('Failed to fetch chargers'); // Throw error, handle in route
+    }
+}
 //AssginChargerToClient 
 async function AssginChargerToClient(req, res) {
     try {
@@ -827,6 +862,8 @@ module.exports = {
         DeActivateOrActivateCharger,
         //ASSIGN TO CLIENT
         AssginChargerToClient,
+        FetchClientUserToAssginCharger,
+        FetchUnAllocatedChargerToAssgin,
         //WALLET
         FetchCommissionAmtReseller,
         //PROFILE

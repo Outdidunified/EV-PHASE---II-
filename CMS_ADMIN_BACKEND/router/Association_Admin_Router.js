@@ -106,6 +106,10 @@ router.post('/FetchAllocatedChargerByClientToAssociation', async (req, res) => {
     }
 });
 // Route to DeActivateOrActivate Reseller
+router.post('/UpdateDevice', functions.UpdateDevice, (req, res) => {
+    res.status(200).json({ status: 'Success' ,  message: 'Charger updated successfully' });
+});
+// Route to DeActivateOrActivate Reseller
 router.post('/DeActivateOrActivateCharger', functions.DeActivateOrActivateCharger, (req, res) => {
     res.status(200).json({ status: 'Success' ,  message: 'Charger updated successfully' });
 });

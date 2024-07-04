@@ -1,50 +1,49 @@
 const database = require('../db');
 
-const authenticate = async (req, res, next) => {
+const authenticate = async (req) => {
     try {
         const { email, password } = req.body;
 
         // Check if email or password is missing
         if (!email || !password) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return { status: 401, message: 'Invalid credentials' };
         }
 
         const db = await database.connectToDatabase();
         const usersCollection = db.collection('users');
         const clientCollection = db.collection('client_details');
 
-        // Fetch user by email
-        const user = await usersCollection.findOne({ email_id: email });
-        
+        // Fetch user by email and check if the status is true
+        const user = await usersCollection.findOne({ email_id: email, status: true });
+
         // Check if user is found and password matches
         if (!user || user.password !== password) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return { status: 401, message: 'Invalid credentials or user is deactivated' };
         }
 
-        // Fetch client details using client_id
-        const getClientdetails = await clientCollection.findOne({ client_id: user.client_id });
+        // Fetch client details using client_id and check if the status is true
+        const getClientDetails = await clientCollection.findOne({ client_id: user.client_id, status: true });
 
-        // If client details not found, return an error
-        if (!getClientdetails) {
-            return res.status(404).json({ message: 'Client details not found' });
+        // If client details not found or deactivated, return an error
+        if (!getClientDetails) {
+            return { status: 404, message: 'Client details not found or deactivated' };
         }
 
         // Return reseller details and user ID
         return {
-            user_id: user.user_id,
-            reseller_id: user.reseller_id,
-            client_name: getClientdetails.client_name,
-            client_id: getClientdetails.client_id
+            status: 200,
+            data: {
+                user_id: user.user_id,
+                reseller_id: user.reseller_id,
+                client_name: getClientDetails.client_name,
+                client_id: getClientDetails.client_id
+            }
         };
 
     } catch (error) {
         console.error('Error during authentication:', error);
-        return res.status(500).json({ message: 'Internal Server Error' });
+        return { status: 500, message: 'Internal Server Error' };
     }
 };
-
-
-
-
 
 module.exports = { authenticate };

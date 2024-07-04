@@ -480,22 +480,25 @@ async function CreateCharger(req, res) {
             ip: null,
             lat: null,
             long: null,
-            wifi_password: null,
             short_description: null,
             charger_accessibility: null,
+            super_admin_commission:null,
             reseller_commission: null,
             client_commission: null,
             assigned_reseller_id: null,
-            assigned_client_id: null,
-            assigned_association_id: null,
-            finance_id: null,
             assigned_reseller_date: null,
+            assigned_client_id: null,
             assigned_client_date: null,
+            assigned_association_id: null,
             assigned_association_date: null,
-            created_date: new Date(),
-            modified_date: null,
+            finance_id: null,
+            unit_price:null,
+            wifi_username:null,
+            wifi_password: null,
             created_by,
+            created_date: new Date(),
             modified_by: null,
+            modified_date: null,
             status: true
         });
 
@@ -886,6 +889,43 @@ async function DeActivateOrActivateReseller(req, res, next) {
 }
 
 //ASSIGN_CHARGER_TO_RESELLER
+//FetchUnAllocatedChargerToAssgin
+async function FetchUnAllocatedChargerToAssgin(req, res) {
+    try {
+        const db = await database.connectToDatabase();
+        const devicesCollection = db.collection("charger_details");
+
+        // Query to fetch chargers where assigned_reseller_id is null
+        const chargers = await devicesCollection.find({ assigned_reseller_id: null , status: true}).toArray();
+
+        return chargers; // Only return data, don't send response
+    } catch (error) {
+        console.error(`Error fetching chargers: ${error}`);
+        throw new Error('Failed to fetch chargers'); // Throw error, handle in route
+    }
+}
+//FetchResellersToAssgin
+async function FetchResellersToAssgin(req, res) {
+    try {
+        const db = await database.connectToDatabase();
+        const resellerCollection = db.collection("reseller_details");
+
+        // Query to fetch all resellers
+        const resellers = await resellerCollection.find({status:true}).toArray();
+
+        if (!resellers || resellers.length === 0) {
+            return res.status(404).json({ message: 'No resellers found' });
+        }
+
+        // Return the reseller data
+        return res.status(200).json({ status: 'Success', data: resellers });
+
+    } catch (error) {
+        console.error(error);
+        logger.error(`Error fetching resellers: ${error}`);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
 //AssginChargerToReseller 
 async function AssginChargerToReseller(req, res) {
     try {
@@ -969,4 +1009,6 @@ module.exports = {
     DeActivateOrActivateReseller,
     //ASSIGN TO RESELLER
     AssginChargerToReseller,
+    FetchResellersToAssgin,
+    FetchUnAllocatedChargerToAssgin,
 };

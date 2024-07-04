@@ -14,18 +14,22 @@ const authenticate = async (req) => {
         const associationCollection = db.collection('association_details');
 
         // Fetch user by email
-        const user = await usersCollection.findOne({ email_id: email });
-        
+        const user = await usersCollection.findOne({ email_id: email, status: true });
+
         // Check if user is found and password matches
         if (!user || user.password !== password) {
-            return { status: 401, message: 'Invalid credentials' };
+            return { status: 401, message: 'Invalid credentials or deactivated' };
         }
 
-        const getAssociationDetails = await associationCollection.findOne({ association_id: user.association_id });
+        // Fetch association details and check if the status is not false
+        const getAssociationDetails = await associationCollection.findOne({
+            association_id: user.association_id,
+            status: true,
+        });
 
-        // If association details not found, return an error
+        // If association details not found or deactivated, return an error
         if (!getAssociationDetails) {
-            return { status: 404, message: 'Association details not found' };
+            return { status: 404, message: 'Association details not found or deactivated' };
         }
 
         // Return reseller details and user ID

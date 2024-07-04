@@ -170,7 +170,7 @@ async function FetchSpecificUserRoleForSelection() {
 
         // Query to fetch all reseller_id and reseller_name
         const roles = await usersCollection.find(
-        { role_id: { $in: [4, 5] } }, // Filter to fetch role_id 1 and 2
+        { role_id: { $in: [5] } }, // Filter to fetch role_id 1 and 2
         {
             projection: {
                 role_id: 1,
@@ -356,6 +356,51 @@ async function FetchAllocatedChargerByClientToAssociation(req) {
         throw new Error('Failed to fetch chargers'); // Throw error, handle in route
     }
 }
+//UpdateDevice 
+async function UpdateDevice(req, res, next) {
+    try {
+        const { modified_by, charger_id, charger_accessibility , wifi_username, wifi_password,lat, long} = req.body;
+        // Validate the input
+        if (!modified_by || !charger_id || !charger_accessibility || !wifi_username || !wifi_password || !lat || !long) {
+            return res.status(400).json({ message: 'Username, chargerID, charger_accessibility , wifi_username, wifi_password,lat, long}and Status (boolean) are required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const devicesCollection = db.collection("charger_details");
+
+        // Check if the charger exists
+        const existingRole = await devicesCollection.findOne({ charger_id: charger_id });
+        if (!existingRole) {
+            return res.status(404).json({ message: 'chargerID not found' });
+        }
+
+        // Update existing role
+        const updateResult = await devicesCollection.updateOne(
+            { charger_id: charger_id },
+            {
+                $set: {
+                    charger_accessibility: charger_accessibility,
+                    wifi_username: wifi_username,
+                    wifi_password: wifi_password,
+                    lat: lat,
+                    long: long,
+                    modified_by: modified_by,
+                    modified_date: new Date()
+                }
+            }
+        );
+
+        if (updateResult.matchedCount === 0) {
+            return res.status(500).json({ message: 'Failed to update charger' });
+        }
+
+        next();
+    } catch (error) {
+        console.error(error);
+        logger.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
 //DeActivateOrActivate 
 async function DeActivateOrActivateCharger(req, res, next) {
     try {
@@ -438,6 +483,7 @@ module.exports = {
     DeActivateUser,
     //MANAGE CHARGER
     FetchAllocatedChargerByClientToAssociation,
+    UpdateDevice,
     DeActivateOrActivateCharger,
     //WALLET
     FetchCommissionAmtAssociation,
