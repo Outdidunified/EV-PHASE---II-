@@ -228,7 +228,7 @@ async function CreateUser(req, res, next) {
             user_id: newUserId,
             username: username,
             email_id: email_id,
-            password: password,
+            password: parseInt(password),
             phone_no: phone_no,
             wallet_bal: 0,
             autostop_time: null,
@@ -237,10 +237,10 @@ async function CreateUser(req, res, next) {
             autostop_time_is_checked: null,
             autostop_unit_is_checked: null,
             autostop_price_is_checked: null,
-            created_date: new Date(),
-            modified_date: null,
             created_by: created_by,
+            created_date: new Date(),
             modified_by: null,
+            modified_date: null,
             status: true
         });
 

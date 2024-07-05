@@ -99,7 +99,7 @@ router.post('/FetchAllocatedChargerByClientToAssociation', async (req, res) => {
         
         const safeChargers = JSON.parse(JSON.stringify(Chargers));
         
-        res.status(200).json({ status: 'Success', data: safeChargers });
+        res.status(200).json({status: 'Success', data: safeChargers });
     } catch (error) {
         console.error('Error in FetchAllocatedChargerByClientToAssociation route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to FetchAllocatedChargerByClientToAssociation' });
