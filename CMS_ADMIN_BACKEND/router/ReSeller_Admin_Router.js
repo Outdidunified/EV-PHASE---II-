@@ -200,11 +200,10 @@ router.post('/FetchClientUserToAssginCharger', async (req, res) => {
 // Route to FetchUnAllocatedChargerToAssgin 
 router.post('/FetchUnAllocatedChargerToAssgin', async (req, res) => {
     try {
-        const Chargers = await functions.FetchUnAllocatedChargerToAssgin(req);
+        const Chargers = await functions.FetchUnAllocatedChargerToAssgin(req, res);
         
-        const safeChargers = JSON.parse(JSON.stringify(Chargers));
-        
-        res.status(200).json({ status: 'Success', data: safeChargers });
+   
+        res.status(200).json({ status: 'Success', data: Chargers });
     } catch (error) {
         console.error('Error in FetchUnAllocatedChargerToAssgin route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to FetchUnAllocatedChargerToAssgin' });

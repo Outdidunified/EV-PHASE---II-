@@ -602,12 +602,11 @@ async function FetchClientUserToAssginCharger(req, res) {
 //FetchUnAllocatedChargerToAssgin
 async function FetchUnAllocatedChargerToAssgin(req) {
     try {
-        const {client_id} = req.body
+        const {reseller_id} = req.body
         const db = await database.connectToDatabase();
         const devicesCollection = db.collection("charger_details");
 
-        const chargers = await devicesCollection.find({ assigned_association_id: null, assigned_client_id: client_id , status:true }).toArray();
-
+        const chargers = await devicesCollection.find({ assigned_client_id: null, assigned_reseller_id: reseller_id , status:true }).toArray();
         return chargers; // Only return data, don't send response
     } catch (error) {
         console.error(`Error fetching chargers: ${error}`);

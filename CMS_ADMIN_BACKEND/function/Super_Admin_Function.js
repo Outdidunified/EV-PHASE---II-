@@ -97,6 +97,55 @@ async function CreateUserRole(req, res, next) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 }
+// UpdateUserRole
+async function UpdateUserRole(req, res, next) {
+    try {
+        const { role_id, new_rolename, modified_by } = req.body;
+
+        // Validate the input
+        if (!role_id || !new_rolename || !modified_by) {
+            return res.status(400).json({ message: 'Role ID, new role name, and modified by are required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const UserRole = db.collection("user_roles");
+
+        // Check if the role exists
+        const existingRole = await UserRole.findOne({ role_id: role_id });
+        if (!existingRole) {
+            return res.status(404).json({ message: 'Role ID not found' });
+        }
+
+        // Check if the new role name already exists
+        const existingRoleName = await UserRole.findOne({ role_name: new_rolename });
+        if (existingRoleName && existingRoleName.role_id !== role_id) {
+            return res.status(400).json({ message: 'New role name already exists' });
+        }
+
+        // Update the role name
+        const updateResult = await UserRole.updateOne(
+            { role_id: role_id },
+            {
+                $set: {
+                    role_name: new_rolename,
+                    modified_by: modified_by,
+                    modified_date: new Date()
+                }
+            }
+        );
+
+        if (updateResult.matchedCount === 0) {
+            return res.status(500).json({ message: 'Failed to update role' });
+        }
+
+        next();
+    } catch (error) {
+        console.error(error);
+        logger.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
 //DeActivateOrActivate UserRole
 async function DeActivateOrActivateUserRole(req, res, next) {
     try {
@@ -982,6 +1031,7 @@ async function AssginChargerToReseller(req, res) {
 module.exports = { 
     //USER_ROLE 
     CreateUserRole,
+    UpdateUserRole,
     FetchUserRole,
     FetchSpecificUserRole,
     DeActivateOrActivateUserRole,

@@ -51,6 +51,10 @@ router.get('/FetchSpecificUserRole', async (req, res) => {
 router.post('/CreateUserRole', functions.CreateUserRole, (req, res) => {
     res.status(200).json({ status: 'Success' ,  message: 'New user role created successfully' });
 });
+// Route to UpdateUserRole
+router.post('/UpdateUserRole', functions.UpdateUserRole, (req, res) => {
+    res.status(200).json({ status: 'Success' ,  message: 'New user role updated  successfully' });
+});
 // Route to DeActivateOrActivateUserRole
 router.post('/DeActivateOrActivateUserRole', functions.DeActivateOrActivateUserRole, (req, res) => {
     res.status(200).json({ status: 'Success' ,  message: 'User role updated successfully' });
