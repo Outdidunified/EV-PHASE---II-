@@ -126,5 +126,39 @@ router.post('/FetchCommissionAmtAssociation', async (req, res) => {
     }
 });
 
+//ADD USER TO ASSOCIATION
+//ASSGIN
+//FetchUsersWithSpecificRolesToAssgin
+router.get('/FetchUsersWithSpecificRolesToAssgin', async (req, res) => {
+    try {
+        await functions.FetchUsersWithSpecificRolesToAssgin(req, res);
+    } catch (error) {
+        console.error('Error in FetchUsersWithSpecificRolesToAssgin route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to FetchUsersWithSpecificRolesToAssgin' });
+    }
+});
+//AddUserToAssociation
+router.post('/AddUserToAssociation', functions.AddUserToAssociation, (req, res) => {
+    res.status(200).json({ status: 'Success', message: 'User added successfully' });
+});
+//UN_ASSGIN
+//FetchUsersWithSpecificRolesToUnAssgin
+router.post('/FetchUsersWithSpecificRolesToUnAssgin', async (req, res) => {
+    try {
+        await functions.FetchUsersWithSpecificRolesToUnAssgin(req, res);
+    } catch (error) {
+        console.error('Error in FetchUsersWithSpecificRolesToUnAssgin route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to FetchUsersWithSpecificRolesToUnAssgin' });
+    }
+});
+//RemoveUserFromAssociation
+router.post('/RemoveUserFromAssociation', async (req, res) => {
+    try {
+        await functions.RemoveUserFromAssociation(req, res);
+    } catch (error) {
+        console.error('Error in RemoveUserFromAssociation route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to remove user from association' });
+    }
+});
 
 module.exports = router;

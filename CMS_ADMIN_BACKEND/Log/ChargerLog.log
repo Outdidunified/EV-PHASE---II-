@@ -1252,3 +1252,33 @@
 05/07/2024 17:08:46 [INFO]: HTTP Server listening on port 4000
 05/07/2024 17:08:59 [INFO]: HTTP Server listening on port 4000
 06/07/2024 11:03:39 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:09:07 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:11:53 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:15:33 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:20:50 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:22:44 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:24:07 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:24:38 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:27:41 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:28:47 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:28:52 [ERROR]: Error fetching users: TypeError: res.status is not a function
+06/07/2024 15:33:24 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:33:35 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:43:17 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:46:20 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:46:31 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:47:11 [ERROR]: Error fetching users: ReferenceError: res is not defined
+06/07/2024 15:47:26 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:47:29 [ERROR]: Error fetching users: TypeError: Cannot destructure property 'association_id' of 'req.body' as it is undefined.
+06/07/2024 15:48:17 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:48:50 [ERROR]: Error fetching users: TypeError: Cannot destructure property 'association_id' of 'req.body' as it is undefined.
+06/07/2024 15:51:48 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:55:01 [INFO]: HTTP Server listening on port 4000
+06/07/2024 15:55:42 [INFO]: HTTP Server listening on port 4000
+06/07/2024 16:00:40 [INFO]: HTTP Server listening on port 4000
+06/07/2024 16:02:31 [INFO]: HTTP Server listening on port 4000
+06/07/2024 16:02:48 [INFO]: HTTP Server listening on port 4000
+06/07/2024 16:04:35 [INFO]: HTTP Server listening on port 4000
+06/07/2024 16:04:50 [INFO]: HTTP Server listening on port 4000
+06/07/2024 16:05:10 [INFO]: HTTP Server listening on port 4000
+06/07/2024 16:19:21 [INFO]: HTTP Server listening on port 4000
