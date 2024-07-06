@@ -100,10 +100,11 @@ async function CreateUserRole(req, res, next) {
 // UpdateUserRole
 async function UpdateUserRole(req, res, next) {
     try {
-        const { role_id, new_rolename, modified_by } = req.body;
+        const { role_id, role_name, modified_by } = req.body;
+        console.log(req.body)
 
         // Validate the input
-        if (!role_id || !new_rolename || !modified_by) {
+        if (!role_id || !role_name || !modified_by) {
             return res.status(400).json({ message: 'Role ID, new role name, and modified by are required' });
         }
 
@@ -117,7 +118,7 @@ async function UpdateUserRole(req, res, next) {
         }
 
         // Check if the new role name already exists
-        const existingRoleName = await UserRole.findOne({ role_name: new_rolename });
+        const existingRoleName = await UserRole.findOne({ role_name: role_name });
         if (existingRoleName && existingRoleName.role_id !== role_id) {
             return res.status(400).json({ message: 'New role name already exists' });
         }
@@ -127,7 +128,7 @@ async function UpdateUserRole(req, res, next) {
             { role_id: role_id },
             {
                 $set: {
-                    role_name: new_rolename,
+                    role_name: role_name,
                     modified_by: modified_by,
                     modified_date: new Date()
                 }
@@ -975,8 +976,8 @@ async function FetchResellersToAssgin(req, res) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 }
-//AssginChargerToReseller 
-async function AssginChargerToReseller(req, res) {
+// AssignChargerToReseller
+async function AssignChargerToReseller(req, res) {
     try {
         const { reseller_id, charger_ids, modified_by } = req.body;
         
@@ -990,7 +991,7 @@ async function AssginChargerToReseller(req, res) {
 
         // Ensure charger_ids is an array
         let chargerIdsArray = Array.isArray(charger_ids) ? charger_ids : [charger_ids];
-        
+
         // Check if all the chargers exist
         const existingChargers = await devicesCollection.find({ charger_id: { $in: chargerIdsArray } }).toArray();
 
@@ -1012,18 +1013,19 @@ async function AssginChargerToReseller(req, res) {
             }
         );
 
-        if (result.modifiedCount === 0) {
+        if (result.matchedCount === 0) {
             throw new Error('Failed to assign chargers to reseller');
         }
 
         return res.status(200).json({ message: 'Chargers Successfully Assigned' });
 
     } catch (error) {
-        console.error(error);
+        console.error(`Error assigning chargers to reseller: ${error}`);
         logger.error(`Error assigning chargers to reseller: ${error}`);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 }
+
 
 
 
@@ -1058,7 +1060,7 @@ module.exports = {
     UpdateReseller,
     DeActivateOrActivateReseller,
     //ASSIGN TO RESELLER
-    AssginChargerToReseller,
+    AssignChargerToReseller,
     FetchResellersToAssgin,
     FetchUnAllocatedChargerToAssgin,
 };

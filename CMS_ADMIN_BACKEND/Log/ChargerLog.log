@@ -1241,3 +1241,14 @@
 05/07/2024 15:19:40 [INFO]: HTTP Server listening on port 4000
 05/07/2024 15:20:32 [INFO]: HTTP Server listening on port 4000
 05/07/2024 15:40:04 [INFO]: HTTP Server listening on port 4000
+05/07/2024 16:52:20 [INFO]: HTTP Server listening on port 4000
+05/07/2024 16:52:29 [INFO]: HTTP Server listening on port 4000
+05/07/2024 16:52:33 [ERROR]: new_rolename is not defined
+05/07/2024 16:52:34 [ERROR]: new_rolename is not defined
+05/07/2024 16:52:43 [ERROR]: new_rolename is not defined
+05/07/2024 16:52:43 [INFO]: HTTP Server listening on port 4000
+05/07/2024 16:52:59 [INFO]: HTTP Server listening on port 4000
+05/07/2024 17:05:41 [ERROR]: Error assigning chargers to reseller: Error: Failed to assign chargers to reseller
+05/07/2024 17:08:46 [INFO]: HTTP Server listening on port 4000
+05/07/2024 17:08:59 [INFO]: HTTP Server listening on port 4000
+06/07/2024 11:03:39 [INFO]: HTTP Server listening on port 4000
