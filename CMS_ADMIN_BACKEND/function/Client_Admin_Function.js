@@ -19,12 +19,12 @@ async function FetchAssociationUser(req, res) {
         throw new Error('Error fetching client details');
     }
 }
-//FetchChargerDetailsWithSession
+// FetchChargerDetailsWithSession
 async function FetchChargerDetailsWithSession(req) {
     try {
         const { association_id } = req.body;
 
-        // Validate client_id
+        // Validate association_id
         if (!association_id) {
             throw new Error('Association ID is required');
         }
@@ -47,7 +47,6 @@ async function FetchChargerDetailsWithSession(req) {
             },
             {
                 $addFields: {
-                    chargerID: "$charger_id",
                     sessiondata: {
                         $cond: {
                             if: { $gt: [{ $size: "$sessions" }, 0] },
@@ -71,13 +70,17 @@ async function FetchChargerDetailsWithSession(req) {
             {
                 $project: {
                     _id: 0,
-                    chargerID: 1,
+                    charger_id: 1,
+                    assigned_association_id: 1,
+                    finance_id: 1,
+                    client_commission:1,              
                     sessiondata: 1
                 }
             }
         ]).toArray();
+
         if (!result || result.length === 0) {
-            throw new Error('No chargers found for the specified AssociationID');
+            throw new Error('No chargers found for the specified Association ID');
         }
 
         // Sort sessiondata within each chargerID based on the first session's stop_time
@@ -94,6 +97,8 @@ async function FetchChargerDetailsWithSession(req) {
         throw error;
     }
 }
+
+
 //CreateAssociationUser
 async function CreateAssociationUser(req, res, next) {
     try {
@@ -400,47 +405,48 @@ async function UpdateClientProfile(req, res, next) {
 }
 
 //CHARGER Function
-//FetchAllocatedCharger
+// FetchAllocatedCharger
 async function FetchAllocatedCharger(req) {
     try {
-        const {client_id} = req.body;
+        const { client_id } = req.body;
         const db = await database.connectToDatabase();
         const devicesCollection = db.collection("charger_details");
 
-        // Aggregation to fetch chargers with client names
-        const chargersWithClients = await devicesCollection.aggregate([
+        // Aggregation to fetch chargers with association names
+        const chargersWithAssociations = await devicesCollection.aggregate([
             {
-                $match: { assigned_association_id: { $ne: null }, assigned_client_id: client_id } // Find chargers with assigned clients
+                $match: { assigned_association_id: { $ne: null }, assigned_client_id: client_id } // Find chargers with assigned associations
             },
             {
                 $lookup: {
-                    from: 'client_details', // Collection name for client details
-                    localField: 'assigned_client_id',
-                    foreignField: 'client_id', // Assuming client_id is the field name in client_details
-                    as: 'clientDetails'
+                    from: 'association_details', // Collection name for association details
+                    localField: 'assigned_association_id',
+                    foreignField: 'association_id', // Assuming association_id is the field name in association_details
+                    as: 'associationDetails'
                 }
             },
             {
-                $unwind: '$clientDetails' // Unwind the array to include client details as an object
+                $unwind: '$associationDetails' // Unwind the array to include association details as an object
             },
             {
                 $addFields: {
-                    client_name: '$clientDetails.client_name' // Include the client name in the result
+                    association_name: '$associationDetails.association_name' // Include the association name in the result
                 }
             },
             {
                 $project: {
-                    clientDetails: 0 // Exclude the full clientDetails object
+                    associationDetails: 0 // Exclude the full associationDetails object
                 }
             }
         ]).toArray();
 
-        return chargersWithClients; // Only return data, don't send response
+        return chargersWithAssociations; // Only return data, don't send response
     } catch (error) {
         console.error(`Error fetching chargers: ${error}`);
         throw new Error('Failed to fetch chargers'); // Throw error, handle in route
     }
 }
+
 //FetchUnAllocatedCharger
 async function FetchUnAllocatedCharger(req) {
     try {
@@ -524,7 +530,7 @@ async function FetchSpecificUserRoleForSelection() {
 
         // Query to fetch all reseller_id and reseller_name
         const roles = await usersCollection.find(
-        { role_id: { $in: [3, 4] } }, // Filter to fetch role_id 1 and 2
+        { role_id: { $in: [4] } }, // Filter to fetch role_id 1 and 2
         {
             projection: {
                 role_id: 1,
@@ -607,7 +613,7 @@ async function CreateUser(req, res, next) {
             user_id: newUserId,
             username: username,
             email_id: email_id,
-            password: password,
+            password: parseInt(password),
             phone_no: phone_no,
             wallet_bal: 0,
             autostop_time: null,
@@ -616,10 +622,10 @@ async function CreateUser(req, res, next) {
             autostop_time_is_checked: null,
             autostop_unit_is_checked: null,
             autostop_price_is_checked: null,
-            created_date: new Date(),
-            modified_date: null,
             created_by: created_by,
+            created_date: new Date(),
             modified_by: null,
+            modified_date: null,
             status: true
         });
 
@@ -766,7 +772,6 @@ async function FetchFinanceDetails() {
 async function CreateFinanceDetails(req, res, next) {
     try {
         const {
-            association_id,
             client_id,
             eb_charges,
             app_charges,
@@ -779,7 +784,7 @@ async function CreateFinanceDetails(req, res, next) {
         } = req.body;
 
         // Validate required fields
-        if (!association_id || !client_id || !eb_charges || !app_charges || !other_charges || !parking_charges || !rent_charges || !open_a_eb_charges || !open_other_charges || !created_by) {
+        if (!client_id || !eb_charges || !app_charges || !other_charges || !parking_charges || !rent_charges || !open_a_eb_charges || !open_other_charges || !created_by) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
@@ -796,7 +801,6 @@ async function CreateFinanceDetails(req, res, next) {
         // Insert the new finance detail
         const result = await financeCollection.insertOne({
             finance_id: newFinanceId,
-            association_id,
             client_id,
             eb_charges,
             app_charges,
@@ -805,10 +809,10 @@ async function CreateFinanceDetails(req, res, next) {
             rent_charges,
             open_a_eb_charges,
             open_other_charges,
-            created_date: new Date(),
-            modified_date: null,
             created_by,
+            created_date: new Date(),
             modified_by: null,
+            modified_date: null,
             status: true
         });
 
@@ -829,7 +833,6 @@ async function UpdateFinanceDetails(req, res, next) {
     try {
         const {
             finance_id,
-            association_id,
             client_id,
             eb_charges,
             app_charges,
@@ -842,7 +845,7 @@ async function UpdateFinanceDetails(req, res, next) {
         } = req.body;
 
         // Validate required fields
-        if (!finance_id || !association_id || !client_id || !eb_charges || !app_charges || !other_charges || !parking_charges || !rent_charges || !open_a_eb_charges || !open_other_charges || !modified_by) {
+        if (!finance_id  || !client_id || !eb_charges || !app_charges || !other_charges || !parking_charges || !rent_charges || !open_a_eb_charges || !open_other_charges || !modified_by) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
@@ -860,7 +863,6 @@ async function UpdateFinanceDetails(req, res, next) {
             { finance_id: finance_id },
             {
                 $set: {
-                    association_id,
                     client_id,
                     eb_charges,
                     app_charges,
@@ -975,6 +977,92 @@ async function AssignFinanceToCharger(req, res, next) {
 }
 
 
+//ASSIGN_CHARGER_TO_ASSOCIATION
+//FetchAssociationUserToAssginCharger
+async function FetchAssociationUserToAssginCharger(req, res) {
+    try {
+        const { client_id } = req.body; 
+        const db = await database.connectToDatabase();
+        const associationCollection = db.collection("association_details");
+
+        const users = await associationCollection.find({ client_id: parseInt(client_id) , status: true}).toArray();
+
+        return users;
+
+    } catch (error) {
+        console.error(`Error fetching client details: ${error}`);
+        logger.error(`Error fetching client details: ${error}`);
+        throw new Error('Error fetching client details');
+    }
+}
+//FetchUnAllocatedChargerToAssgin
+async function FetchUnAllocatedChargerToAssgin(req) {
+    try {
+        const {client_id} = req.body
+        const db = await database.connectToDatabase();
+        const devicesCollection = db.collection("charger_details");
+
+        const chargers = await devicesCollection.find({ assigned_association_id: null, assigned_client_id: client_id , status:true }).toArray();
+
+        return chargers; // Only return data, don't send response
+    } catch (error) {
+        console.error(`Error fetching chargers: ${error}`);
+        throw new Error('Failed to fetch chargers'); // Throw error, handle in route
+    }
+}
+
+//AssginChargerToAssociation
+async function AssginChargerToAssociation(req, res) {
+    try {
+        const { association_id, charger_id, client_commission ,modified_by} = req.body;
+
+
+        // Validate required fields
+        if (!association_id || !charger_id || !modified_by || !client_commission) {
+            return res.status(400).json({ message: 'Association ID, Charger IDs, client_commission and Modified By are required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const devicesCollection = db.collection("charger_details");
+
+        // Ensure charger_ids is an array
+        let chargerIdsArray = Array.isArray(charger_id) ? charger_id : [charger_id];
+
+        // Check if all the chargers exist
+        const existingChargers = await devicesCollection.find({ charger_id: { $in: chargerIdsArray } }).toArray();
+
+        if (existingChargers.length !== chargerIdsArray.length) {
+            return res.status(404).json({ message: 'One or more chargers not found' });
+        }
+
+        // Update the reseller details for all chargers
+        const result = await devicesCollection.updateMany(
+            { charger_id: { $in: chargerIdsArray } },
+            {
+                $set: {
+                    assigned_association_id: association_id,
+                    client_commission: client_commission,
+                    assigned_association_date: new Date(),
+                    modified_date: new Date(),
+                    modified_by
+                }
+            }
+        );
+
+        if (result.modifiedCount === 0) {ß
+            throw new Error('Failed to assign chargers to reseller');
+        }
+
+        return res.status(200).json({ status:"Success",message: 'Chargers Successfully Assigned' });
+
+    } catch (error) {
+        console.error(error);s
+        logger.error(`Error assigning chargers to reseller: ${error}`);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
+
 module.exports = { 
     //MANAGE USER
     FetchUser,
@@ -1006,4 +1094,8 @@ module.exports = {
     DeactivateOrActivateFinanceDetails,
     //ASSGIN FINANCE TO CHARGER
     AssignFinanceToCharger,
+    FetchAssociationUserToAssginCharger,
+    FetchUnAllocatedChargerToAssgin,
+    //ASSGIN FINANCE TO CHARGER
+    AssginChargerToAssociation,
 };

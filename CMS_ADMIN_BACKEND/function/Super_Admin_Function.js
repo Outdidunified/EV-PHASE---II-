@@ -97,6 +97,56 @@ async function CreateUserRole(req, res, next) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 }
+// UpdateUserRole
+async function UpdateUserRole(req, res, next) {
+    try {
+        const { role_id, role_name, modified_by } = req.body;
+        console.log(req.body)
+
+        // Validate the input
+        if (!role_id || !role_name || !modified_by) {
+            return res.status(400).json({ message: 'Role ID, new role name, and modified by are required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const UserRole = db.collection("user_roles");
+
+        // Check if the role exists
+        const existingRole = await UserRole.findOne({ role_id: role_id });
+        if (!existingRole) {
+            return res.status(404).json({ message: 'Role ID not found' });
+        }
+
+        // Check if the new role name already exists
+        const existingRoleName = await UserRole.findOne({ role_name: role_name });
+        if (existingRoleName && existingRoleName.role_id !== role_id) {
+            return res.status(400).json({ message: 'New role name already exists' });
+        }
+
+        // Update the role name
+        const updateResult = await UserRole.updateOne(
+            { role_id: role_id },
+            {
+                $set: {
+                    role_name: role_name,
+                    modified_by: modified_by,
+                    modified_date: new Date()
+                }
+            }
+        );
+
+        if (updateResult.matchedCount === 0) {
+            return res.status(500).json({ message: 'Failed to update role' });
+        }
+
+        next();
+    } catch (error) {
+        console.error(error);
+        logger.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
 //DeActivateOrActivate UserRole
 async function DeActivateOrActivateUserRole(req, res, next) {
     try {
@@ -248,7 +298,7 @@ async function CreateUser(req, res, next) {
             user_id: newUserId,
             username: username,
             email_id: email_id,
-            password: password,
+            password: parseInt(password),
             phone_no: phone_no,
             wallet_bal: wallet_bal || 0,
             autostop_time: null,
@@ -257,10 +307,10 @@ async function CreateUser(req, res, next) {
             autostop_time_is_checked: null,
             autostop_unit_is_checked: null,
             autostop_price_is_checked: null,
-            created_date: new Date(),
-            modified_date: null,
             created_by: created_by,
+            created_date: new Date(),
             modified_by: null,
+            modified_date: null,
             status: true
         });
 
@@ -480,22 +530,25 @@ async function CreateCharger(req, res) {
             ip: null,
             lat: null,
             long: null,
-            wifi_password: null,
             short_description: null,
             charger_accessibility: null,
+            superadmin_commission:null,
             reseller_commission: null,
             client_commission: null,
             assigned_reseller_id: null,
-            assigned_client_id: null,
-            assigned_association_id: null,
-            finance_id: null,
             assigned_reseller_date: null,
+            assigned_client_id: null,
             assigned_client_date: null,
+            assigned_association_id: null,
             assigned_association_date: null,
-            created_date: new Date(),
-            modified_date: null,
+            finance_id: null,
+            unit_price:null,
+            wifi_username:null,
+            wifi_password: null,
             created_by,
+            created_date: new Date(),
             modified_by: null,
+            modified_date: null,
             status: true
         });
 
@@ -886,8 +939,45 @@ async function DeActivateOrActivateReseller(req, res, next) {
 }
 
 //ASSIGN_CHARGER_TO_RESELLER
-//AssginChargerToReseller 
-async function AssginChargerToReseller(req, res) {
+//FetchUnAllocatedChargerToAssgin
+async function FetchUnAllocatedChargerToAssgin(req, res) {
+    try {
+        const db = await database.connectToDatabase();
+        const devicesCollection = db.collection("charger_details");
+
+        // Query to fetch chargers where assigned_reseller_id is null
+        const chargers = await devicesCollection.find({ assigned_reseller_id: null , status: true}).toArray();
+
+        return chargers; // Only return data, don't send response
+    } catch (error) {
+        console.error(`Error fetching chargers: ${error}`);
+        throw new Error('Failed to fetch chargers'); // Throw error, handle in route
+    }
+}
+//FetchResellersToAssgin
+async function FetchResellersToAssgin(req, res) {
+    try {
+        const db = await database.connectToDatabase();
+        const resellerCollection = db.collection("reseller_details");
+
+        // Query to fetch all resellers
+        const resellers = await resellerCollection.find({status:true}).toArray();
+
+        if (!resellers || resellers.length === 0) {
+            return res.status(404).json({ message: 'No resellers found' });
+        }
+
+        // Return the reseller data
+        return res.status(200).json({ status: 'Success', data: resellers });
+
+    } catch (error) {
+        console.error(error);
+        logger.error(`Error fetching resellers: ${error}`);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+// AssignChargerToReseller
+async function AssignChargerToReseller(req, res) {
     try {
         const { reseller_id, charger_ids, modified_by } = req.body;
         
@@ -901,7 +991,7 @@ async function AssginChargerToReseller(req, res) {
 
         // Ensure charger_ids is an array
         let chargerIdsArray = Array.isArray(charger_ids) ? charger_ids : [charger_ids];
-        
+
         // Check if all the chargers exist
         const existingChargers = await devicesCollection.find({ charger_id: { $in: chargerIdsArray } }).toArray();
 
@@ -915,22 +1005,22 @@ async function AssginChargerToReseller(req, res) {
             {
                 $set: {
                     assigned_reseller_id: reseller_id,
-                    superadmin_commission: 0,
-                    assigned_to_reseller_date: new Date(),
+                    superadmin_commission: "0",
+                    assigned_reseller_date: new Date(),
                     modified_date: new Date(),
                     modified_by
                 }
             }
         );
 
-        if (result.modifiedCount === 0) {
+        if (result.matchedCount === 0) {
             throw new Error('Failed to assign chargers to reseller');
         }
 
         return res.status(200).json({ message: 'Chargers Successfully Assigned' });
 
     } catch (error) {
-        console.error(error);
+        console.error(`Error assigning chargers to reseller: ${error}`);
         logger.error(`Error assigning chargers to reseller: ${error}`);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
@@ -939,9 +1029,11 @@ async function AssginChargerToReseller(req, res) {
 
 
 
+
 module.exports = { 
     //USER_ROLE 
     CreateUserRole,
+    UpdateUserRole,
     FetchUserRole,
     FetchSpecificUserRole,
     DeActivateOrActivateUserRole,
@@ -968,5 +1060,7 @@ module.exports = {
     UpdateReseller,
     DeActivateOrActivateReseller,
     //ASSIGN TO RESELLER
-    AssginChargerToReseller,
+    AssignChargerToReseller,
+    FetchResellersToAssgin,
+    FetchUnAllocatedChargerToAssgin,
 };

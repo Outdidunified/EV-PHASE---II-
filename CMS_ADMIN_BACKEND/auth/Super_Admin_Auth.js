@@ -1,6 +1,6 @@
 const database = require('../db');
 
-const authenticate = async (req, res) => {
+const authenticate = async (req) => {
     try {
         const { email, password } = req.body;
 
@@ -14,7 +14,7 @@ const authenticate = async (req, res) => {
 
         // Query to get user by email with the role
         const userWithRole = await usersCollection.aggregate([
-            { $match: { email_id: email } },
+            { $match: { email_id: email, status: true } }, // Check user status
             {
                 $lookup: {
                     from: 'user_roles',
@@ -24,11 +24,12 @@ const authenticate = async (req, res) => {
                 }
             },
             { $unwind: '$roles' },
+            { $match: { 'roles.status': true } }, // Check role status
             { $limit: 1 }
         ]).toArray();
 
         if (userWithRole.length === 0) {
-            return { error: true, status: 401, message: 'Invalid credentials' };
+            return { error: true, status: 401, message: 'Invalid credentials or inactive user/role' };
         }
 
         const user = userWithRole[0];
@@ -39,17 +40,12 @@ const authenticate = async (req, res) => {
         }
 
         // Return user_id and email_id
-        return { error: false, user: { user_id: user.user_id,username: user.username ,email_id: user.email_id } };
+        return { error: false, user: { user_id: user.user_id, username: user.username, email_id: user.email_id } };
 
     } catch (error) {
         console.error(error);
         return { error: true, status: 500, message: 'Internal Server Error' };
     }
 };
-
-module.exports = { authenticate };
-
-
-
 
 module.exports = { authenticate };

@@ -30,6 +30,7 @@ async function FetchUserProfile(req, res) {
                     email_id: 1,
                     phone_no: 1,
                     wallet_bal: 1,
+                    password:1,
                     autostop_time: 1,
                     autostop_unit: 1,
                     autostop_price: 1,
@@ -169,7 +170,7 @@ async function FetchSpecificUserRoleForSelection() {
 
         // Query to fetch all reseller_id and reseller_name
         const roles = await usersCollection.find(
-        { role_id: { $in: [4, 5] } }, // Filter to fetch role_id 1 and 2
+        { role_id: { $in: [5] } }, // Filter to fetch role_id 1 and 2
         {
             projection: {
                 role_id: 1,
@@ -227,7 +228,7 @@ async function CreateUser(req, res, next) {
             user_id: newUserId,
             username: username,
             email_id: email_id,
-            password: password,
+            password: parseInt(password),
             phone_no: phone_no,
             wallet_bal: 0,
             autostop_time: null,
@@ -236,10 +237,10 @@ async function CreateUser(req, res, next) {
             autostop_time_is_checked: null,
             autostop_unit_is_checked: null,
             autostop_price_is_checked: null,
-            created_date: new Date(),
-            modified_date: null,
             created_by: created_by,
+            created_date: new Date(),
             modified_by: null,
+            modified_date: null,
             status: true
         });
 
@@ -355,6 +356,51 @@ async function FetchAllocatedChargerByClientToAssociation(req) {
         throw new Error('Failed to fetch chargers'); // Throw error, handle in route
     }
 }
+//UpdateDevice 
+async function UpdateDevice(req, res, next) {
+    try {
+        const { modified_by, charger_id, charger_accessibility , wifi_username, wifi_password,lat, long} = req.body;
+        // Validate the input
+        if (!modified_by || !charger_id || !charger_accessibility || !wifi_username || !wifi_password || !lat || !long) {
+            return res.status(400).json({ message: 'Username, chargerID, charger_accessibility , wifi_username, wifi_password,lat, long}and Status (boolean) are required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const devicesCollection = db.collection("charger_details");
+
+        // Check if the charger exists
+        const existingRole = await devicesCollection.findOne({ charger_id: charger_id });
+        if (!existingRole) {
+            return res.status(404).json({ message: 'chargerID not found' });
+        }
+
+        // Update existing role
+        const updateResult = await devicesCollection.updateOne(
+            { charger_id: charger_id },
+            {
+                $set: {
+                    charger_accessibility: charger_accessibility,
+                    wifi_username: wifi_username,
+                    wifi_password: wifi_password,
+                    lat: lat,
+                    long: long,
+                    modified_by: modified_by,
+                    modified_date: new Date()
+                }
+            }
+        );
+
+        if (updateResult.matchedCount === 0) {
+            return res.status(500).json({ message: 'Failed to update charger' });
+        }
+
+        next();
+    } catch (error) {
+        console.error(error);
+        logger.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
 //DeActivateOrActivate 
 async function DeActivateOrActivateCharger(req, res, next) {
     try {
@@ -424,6 +470,150 @@ async function FetchCommissionAmtAssociation(req, res) {
     }
 }
 
+
+//ADD USER TO ASSOCIATION
+//ASSGIN
+// FetchUsersWithSpecificRolesToAssgin
+async function FetchUsersWithSpecificRolesToAssgin(req, res) {
+    try {
+        const db = await database.connectToDatabase();
+        const usersCollection = db.collection("users");
+
+        // Query to find users with role_id not in [1, 2, 3, 4] and association_id is null
+        const users = await usersCollection.find({
+            role_id: { $nin: [1, 2, 3, 4] },
+            association_id: null
+        }).toArray();
+
+        if (!users || users.length === 0) {
+            return res.status(404).json({ message: 'No users found' });
+        }
+
+        return res.status(200).json({status: 'Success', data: users });
+    } catch (error) {
+        console.error(`Error fetching users: ${error}`);
+        logger.error(`Error fetching users: ${error}`);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+// AddUserToAssociation
+async function AddUserToAssociation(req, res) {
+    try {
+        const { association_id, user_id, modified_by } = req.body;
+
+        // Validate required fields
+        if (!association_id || !user_id || !modified_by) {
+            return res.status(400).json({ message: 'Association ID, User ID, and Modified By are required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const usersCollection = db.collection("users");
+
+        // Check if the user exists
+        const existingUser = await usersCollection.findOne({ user_id: user_id });
+        if (!existingUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Update the user details with the association ID
+        const result = await usersCollection.updateOne(
+            { user_id: user_id },
+            {
+                $set: {
+                    association_id: parseInt(association_id),
+                    modified_date: new Date(),
+                    modified_by: modified_by
+                }
+            }
+        );
+
+        if (result.modifiedCount === 0) {
+            throw new Error('Failed to assign user to association');
+        }
+
+        return res.status(200).json({ status: "Success", message: 'User Successfully Assigned to Association' });
+
+    } catch (error) {
+        console.error(`Error assigning user to association: ${error}`);
+        logger.error(`Error assigning user to association: ${error}`);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+//UN_ASSGIN
+// FetchUsersWithSpecificRolesToUnAssgin
+async function FetchUsersWithSpecificRolesToUnAssgin(req, res) {
+    try {
+        const { association_id } = req.body;
+
+        if (!association_id) {
+            return res.status(400).json({ message: 'Association ID is required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const usersCollection = db.collection("users");
+
+        // Query to find users with role_id not in [1, 2, 3, 4] and association_id matches
+        const users = await usersCollection.find({
+            role_id: { $nin: [1, 2, 3, 4] },
+            association_id: association_id
+        }).toArray();
+
+        if (!users || users.length === 0) {
+            return res.status(404).json({ message: 'No users found' });
+        }
+
+        return res.status(200).json({ status: 'Success', data: users });
+    } catch (error) {
+        console.error(`Error fetching users: ${error}`);
+        logger.error(`Error fetching users: ${error}`);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+// RemoveUserFromAssociation
+async function RemoveUserFromAssociation(req, res) {
+    try {
+        const { user_id,association_id, modified_by } = req.body;
+
+        // Validate required fields
+        if (!user_id || !association_id ||!modified_by) {
+            return res.status(400).json({ message: 'User ID , association_id and Modified By are required' });
+        }
+
+        const db = await database.connectToDatabase();
+        const usersCollection = db.collection("users");
+
+        // Find the user to ensure they exist
+        const user = await usersCollection.findOne({ user_id: user_id , association_id:association_id});
+
+        if (!user) {
+            return res.status(404).json({ message: 'User does not exits' });
+        }
+
+        // Update the user's association_id to null
+        const result = await usersCollection.updateOne(
+            { user_id: user_id },
+            {
+                $set: {
+                    association_id: null,
+                    modified_date: new Date(),
+                    modified_by: modified_by
+                }
+            }
+        );
+
+        if (result.modifiedCount === 0) {
+            throw new Error('Failed to remove user from association');
+        }
+
+        return res.status(200).json({ status: 'Success', message: 'User successfully removed from association' });
+
+    } catch (error) {
+        console.error(`Error removing user from association: ${error}`);
+        logger.error(`Error removing user from association: ${error}`);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
 module.exports = { 
     //PROFILE
     FetchUserProfile,
@@ -437,7 +627,15 @@ module.exports = {
     DeActivateUser,
     //MANAGE CHARGER
     FetchAllocatedChargerByClientToAssociation,
+    UpdateDevice,
     DeActivateOrActivateCharger,
     //WALLET
     FetchCommissionAmtAssociation,
+    //ADD USER TO ASSOCIATION
+    //ASSGIN
+    FetchUsersWithSpecificRolesToAssgin,
+    AddUserToAssociation,
+    //UN_ASSGIN
+    FetchUsersWithSpecificRolesToUnAssgin,
+    RemoveUserFromAssociation,
 }

@@ -7,7 +7,7 @@ const flatted = require('flatted'); // Add this at the top of your file
 // Route to check login credentials
 router.post('/CheckLoginCredentials', async (req, res) => {
     try {
-        const result = await Auth.authenticate(req, res);
+        const result = await Auth.authenticate(req);
 
         if (result.error) {
             return res.status(result.status).json({ message: result.message });
@@ -50,6 +50,10 @@ router.get('/FetchSpecificUserRole', async (req, res) => {
 // Route to CreateUserRole
 router.post('/CreateUserRole', functions.CreateUserRole, (req, res) => {
     res.status(200).json({ status: 'Success' ,  message: 'New user role created successfully' });
+});
+// Route to UpdateUserRole
+router.post('/UpdateUserRole', functions.UpdateUserRole, (req, res) => {
+    res.status(200).json({ status: 'Success' ,  message: 'New user role updated  successfully' });
 });
 // Route to DeActivateOrActivateUserRole
 router.post('/DeActivateOrActivateUserRole', functions.DeActivateOrActivateUserRole, (req, res) => {
@@ -224,24 +228,32 @@ router.post('/DeActivateOrActivateReseller', functions.DeActivateOrActivateResel
 });
 
 //ASSIGN TO RESELLER
-// Route to FetchUnallocatedCharger
-router.get('/FetchUnallocatedCharger', async (req, res) => {
+// Route to FetchUnAllocatedChargerToAssgin 
+router.get('/FetchUnAllocatedChargerToAssgin', async (req, res) => {
     try {
-        const Chargers = await functions.FetchCharger();
+        const Chargers = await functions.FetchUnAllocatedChargerToAssgin(req);
         
-        // Filter out any circular references (optional, only if necessary)
         const safeChargers = JSON.parse(JSON.stringify(Chargers));
         
         res.status(200).json({ status: 'Success', data: safeChargers });
     } catch (error) {
-        console.error('Error in FetchUnallocatedCharger route:', error);
-        res.status(500).json({ status: 'Failed', message: 'Failed to fetch unallocated charger' });
+        console.error('Error in FetchUnAllocatedChargerToAssgin route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to FetchUnAllocatedChargerToAssgin' });
+    }
+});
+// Route to FetchResellersToAssgin
+router.get('/FetchResellersToAssgin', async (req, res) => {
+    try {
+        await functions.FetchResellersToAssgin(req, res);
+    } catch (error) {
+        console.error('Error in FetchResellersToAssgin route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to FetchResellersToAssgin' });
     }
 });
 // Route to AssginChargerToReseller
 router.post('/AssginChargerToReseller', async (req, res) => {
     try {
-        await functions.AssginChargerToReseller(req, res);
+        await functions.AssignChargerToReseller(req, res);
     } catch (error) {
         console.error('Error in AssginChargerToReseller route:', error); 
         res.status(500).json({ message: 'Failed to AssginChargerToReseller' });

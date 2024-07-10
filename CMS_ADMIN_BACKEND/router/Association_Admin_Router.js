@@ -7,15 +7,14 @@ const functions = require("../function/Association_Admin_Function.js")
 router.post('/CheckLoginCredentials', async (req, res) => {
     try {
         const result = await Auth.authenticate(req);
+
+        if (result.status !== 200) {
+            return res.status(result.status).json({ message: result.message });
+        }
+
         res.status(200).json({
-            message: 'Success',
-            data: {
-                user_id: result.user_id,
-                reseller_id: result.reseller_id,
-                client_id: result.client_id,
-                association_id: result.association_id,
-                association_name: result.association_name,
-            }
+            status: 'Success',
+            data: result.data
         });
     } catch (error) {
         console.error('Error in CheckLoginCredentials route:', error);
@@ -25,7 +24,7 @@ router.post('/CheckLoginCredentials', async (req, res) => {
 
 // PROFILE Route
 // Route to FetchUserProfile 
-router.get('/FetchUserProfile', async (req, res) => {
+router.post('/FetchUserProfile', async (req, res) => {
     try {
         const userdata = await functions.FetchUserProfile(req, res);
         res.status(200).json({ status: 'Success', data: userdata });
@@ -100,11 +99,15 @@ router.post('/FetchAllocatedChargerByClientToAssociation', async (req, res) => {
         
         const safeChargers = JSON.parse(JSON.stringify(Chargers));
         
-        res.status(200).json({ status: 'Success', data: safeChargers });
+        res.status(200).json({status: 'Success', data: safeChargers });
     } catch (error) {
         console.error('Error in FetchAllocatedChargerByClientToAssociation route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to FetchAllocatedChargerByClientToAssociation' });
     }
+});
+// Route to DeActivateOrActivate Reseller
+router.post('/UpdateDevice', functions.UpdateDevice, (req, res) => {
+    res.status(200).json({ status: 'Success' ,  message: 'Charger updated successfully' });
 });
 // Route to DeActivateOrActivate Reseller
 router.post('/DeActivateOrActivateCharger', functions.DeActivateOrActivateCharger, (req, res) => {
@@ -113,7 +116,7 @@ router.post('/DeActivateOrActivateCharger', functions.DeActivateOrActivateCharge
 
 //MANAGE WALLET
 //Route to FetchCommissionAmtAssociation
-router.get('/FetchCommissionAmtAssociation', async (req, res) => {
+router.post('/FetchCommissionAmtAssociation', async (req, res) => {
     try {
         const commissionAmt = await functions.FetchCommissionAmtAssociation(req, res);
         res.status(200).json({ status: 'Success', data: commissionAmt });
@@ -123,5 +126,39 @@ router.get('/FetchCommissionAmtAssociation', async (req, res) => {
     }
 });
 
+//ADD USER TO ASSOCIATION
+//ASSGIN
+//FetchUsersWithSpecificRolesToAssgin
+router.get('/FetchUsersWithSpecificRolesToAssgin', async (req, res) => {
+    try {
+        await functions.FetchUsersWithSpecificRolesToAssgin(req, res);
+    } catch (error) {
+        console.error('Error in FetchUsersWithSpecificRolesToAssgin route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to FetchUsersWithSpecificRolesToAssgin' });
+    }
+});
+//AddUserToAssociation
+router.post('/AddUserToAssociation', functions.AddUserToAssociation, (req, res) => {
+    res.status(200).json({ status: 'Success', message: 'User added successfully' });
+});
+//UN_ASSGIN
+//FetchUsersWithSpecificRolesToUnAssgin
+router.post('/FetchUsersWithSpecificRolesToUnAssgin', async (req, res) => {
+    try {
+        await functions.FetchUsersWithSpecificRolesToUnAssgin(req, res);
+    } catch (error) {
+        console.error('Error in FetchUsersWithSpecificRolesToUnAssgin route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to FetchUsersWithSpecificRolesToUnAssgin' });
+    }
+});
+//RemoveUserFromAssociation
+router.post('/RemoveUserFromAssociation', async (req, res) => {
+    try {
+        await functions.RemoveUserFromAssociation(req, res);
+    } catch (error) {
+        console.error('Error in RemoveUserFromAssociation route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to remove user from association' });
+    }
+});
 
 module.exports = router;

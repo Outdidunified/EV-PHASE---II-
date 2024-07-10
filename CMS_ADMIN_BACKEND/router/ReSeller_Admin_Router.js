@@ -7,13 +7,14 @@ const functions = require("../function/ReSeller_Admin_Function.js");
 router.post('/CheckLoginCredentials', async (req, res) => {
     try {
         const result = await Auth.authenticate(req);
+
+        if (result.status !== 200) {
+            return res.status(result.status).json({ message: result.message });
+        }
+
         res.status(200).json({
-            message: 'Success',
-            data: {
-                user_id: result.user_id,
-                reseller_id: result.reseller_id,
-                reseller_name: result.reseller_name,
-            }
+            status: 'Success',
+            data: result.data
         });
     } catch (error) {
         console.error('Error in CheckLoginCredentials route:', error);
@@ -184,6 +185,30 @@ router.post('/DeActivateOrActivateCharger', functions.DeActivateOrActivateCharge
 });
 
 //ASSIGN TO CLIENT
+// Route to FetchClientUserToAssginCharger
+router.post('/FetchClientUserToAssginCharger', async (req, res) => {
+    try {
+        // Call FetchUser function to get users data
+        const user = await functions.FetchClientUserToAssginCharger(req, res);
+        // Send response with users data
+        res.status(200).json({ status: 'Success', data: user });
+        
+    } catch (error) {
+        console.error('Error in FetchClientUserToAssginCharger route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to fetch users' });
+}});
+// Route to FetchUnAllocatedChargerToAssgin 
+router.post('/FetchUnAllocatedChargerToAssgin', async (req, res) => {
+    try {
+        const Chargers = await functions.FetchUnAllocatedChargerToAssgin(req, res);
+        
+   
+        res.status(200).json({ status: 'Success', data: Chargers });
+    } catch (error) {
+        console.error('Error in FetchUnAllocatedChargerToAssgin route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to FetchUnAllocatedChargerToAssgin' });
+    }
+});
 // Route to AssginChargerToClient
 router.post('/AssginChargerToClient', async (req, res) => {
     try {
