@@ -349,6 +349,7 @@ async function UpdateUser(req, res, next) {
                     phone_no: phone_no,
                     wallet_bal: wallet_bal || existingUser.wallet_bal, 
                     modified_date: new Date(),
+                    password: password,
                     modified_by: modified_by,
                     status: status,
                 }
