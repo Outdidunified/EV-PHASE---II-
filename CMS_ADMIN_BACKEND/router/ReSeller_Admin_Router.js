@@ -61,21 +61,23 @@ router.post('/FetchChargerDetailsWithSession', async (req, res) => {
         }
     }
 });
-// Route to create a new reseller
-router.post('/addNewClient', async(req,res) => {
-    try{
-        const addNewClient = await functions.addNewClient(req);
-        if(addNewClient === true){
+
+// add new client
+router.post('/addNewClient', async (req, res) => {
+    try {
+        const result = await functions.addNewClient(req);
+        if (result === true) {
             res.status(200).json({ message: 'Success', data: 'Client created successfully' });
-        }else{
-            console.log('Internal Server Error');
-            res.json({ status: 'Failed', message: "Internal Server Error" });
+        } else {
+            res.status(500).json({ status: 'Failed', message: "Internal Server Error" });
         }
-    }catch(error){
+    } catch (error) {
         console.error('Error in addNewClient route:', error.message);
-        res.json({ status: 'Failed', message: error.message });
+        const statusCode = error.statusCode || 500; // Default to 500 if no custom status code
+        res.status(statusCode).json({ status: 'Failed', message: error.message });
     }
 });
+
 // Route to update reseller
 router.post('/updateClient', async(req,res) => {
     try{
@@ -88,9 +90,25 @@ router.post('/updateClient', async(req,res) => {
         }
     }catch(error){
         console.error('Error in updateClient route:', error.message);
-        res.json({ status: 'Failed', message: error.message });
+        res.status(500).json({ status: 'Failed', message: error.message });
     }
 });
+
+router.post('/UpdateResellerCommission', async (req,res) => {
+    try{
+        const UpdateResellerCommission = await functions.updateCommission(req);
+        if(UpdateResellerCommission === true){
+            res.status(200).json({ message: 'Success', data: 'Commission updated successfully' });
+        }else{
+            console.log('Internal Server Error');
+            res.status(500).json({ status: 'Failed', message: "Internal Server Error" });
+        }
+    }catch(error){
+        console.error('Error in update reseller commission route:', error.message);
+        res.status(500).json({ status: 'Failed', message: error.message });
+    }
+});
+
 // Route to DeActivateOrActivate Reseller
 router.post('/DeActivateClient', functions.DeActivateClient, (req, res) => {
     try {
@@ -103,10 +121,10 @@ router.post('/DeActivateClient', functions.DeActivateClient, (req, res) => {
 
 // MANAGE USER Routes
 // Route to FetchUser
-router.get('/FetchUsers', async (req, res) => {
+router.post('/FetchUsers', async (req, res) => {
     try {
         // Call FetchUser function to get users data
-        const user = await functions.FetchUser();
+        const user = await functions.FetchUser(req,res);
         // Send response with users data
         res.status(200).json({ status: 'Success', data: user });
         
@@ -127,7 +145,7 @@ router.get('/FetchSpecificUserRoleForSelection', async (req, res) => {
         res.status(500).json({ status: 'Failed', message: 'Failed to FetchSpecificUserForCreateSelection ' });
 }});
 // Route to FetchClientForSelection 
-router.get('/FetchClientForSelection', async (req, res) => {
+router.post('/FetchClientForSelection', async (req, res) => {
     try {
         // Call FetchUser function to get users data
         const user = await functions.FetchClientForSelection(req, res);

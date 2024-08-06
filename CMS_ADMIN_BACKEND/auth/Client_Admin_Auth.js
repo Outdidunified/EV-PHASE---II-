@@ -17,7 +17,7 @@ const authenticate = async (req) => {
         const user = await usersCollection.findOne({ email_id: email, status: true });
 
         // Check if user is found and password matches
-        if (!user || user.password !== password) {
+        if (!user || user.password !== password || user.role_id !== 3) {
             return { status: 401, message: 'Invalid credentials or user is deactivated' };
         }
 
@@ -35,6 +35,7 @@ const authenticate = async (req) => {
             data: {
                 user_id: user.user_id,
                 reseller_id: user.reseller_id,
+                email_id: user.email_id,
                 client_name: getClientDetails.client_name,
                 client_id: getClientDetails.client_id
             }

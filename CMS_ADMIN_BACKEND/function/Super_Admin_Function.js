@@ -192,21 +192,87 @@ async function DeActivateOrActivateUserRole(req, res, next) {
 
 // USER Functions
 //FetchUser
+// async function FetchUser() {
+//     try {
+//         const db = await database.connectToDatabase();
+//         const usersCollection = db.collection("users");
+//         const UserRole = db.collection("user_roles");
+        
+//         // Query to fetch all users
+//         const users = await usersCollection.find().toArray();
+//         const role = await UserRole.findOne({ role_id: users.role_id });
+
+//         console.log(users);
+
+//         // Return the users data
+//         return users;
+//     } catch (error) {
+//         logger.error(`Error fetching users: ${error}`);
+//         throw new Error('Error fetching users');
+//     }
+// }
 async function FetchUser() {
     try {
         const db = await database.connectToDatabase();
         const usersCollection = db.collection("users");
+        const rolesCollection = db.collection("user_roles");
+        const resellerCollection = db.collection("reseller_details");
+        const clientCollection = db.collection("client_details");
+        const associationCollection = db.collection("association_details");
         
         // Query to fetch all users
         const users = await usersCollection.find().toArray();
-
-        // Return the users data
-        return users;
+        
+        // Extract all unique role_ids, reseller_ids, client_ids, and association_ids from users
+        const roleIds = [...new Set(users.map(user => user.role_id))];
+        const resellerIds = [...new Set(users.map(user => user.reseller_id))];
+        const clientIds = [...new Set(users.map(user => user.client_id))];
+        const associationIds = [...new Set(users.map(user => user.association_id))];
+        
+        // Fetch roles based on role_ids
+        const roles = await rolesCollection.find({ role_id: { $in: roleIds } }).toArray();
+        const roleMap = new Map(roles.map(role => [role.role_id, role.role_name]));
+        
+        // Fetch resellers based on reseller_ids
+        let resellers,resellerMap;
+        if(resellerIds){
+            resellers = await resellerCollection.find({ reseller_id: { $in: resellerIds } }).toArray();
+            resellerMap = new Map(resellers.map(reseller => [reseller.reseller_id, reseller.reseller_name]));
+        }
+        
+        // Fetch clients based on client_ids
+        let clients,clientMap;
+        if(clientIds){
+            clients = await clientCollection.find({ client_id: { $in: clientIds } }).toArray();
+            clientMap = new Map(clients.map(client => [client.client_id, client.client_name]));
+        }
+        
+        // Fetch associations based on association_ids
+        let associations,associationMap;
+        if(associationIds){
+            associations = await associationCollection.find({ association_id: { $in: associationIds } }).toArray();
+            associationMap = new Map(associations.map(association => [association.association_id, association.association_name]));
+        }
+        
+        // Attach additional details to each user
+        const usersWithDetails = users.map(user => ({
+            ...user,
+            role_name: roleMap.get(user.role_id) || 'Unknown',
+            reseller_name: resellerMap.get(user.reseller_id) || null,
+            client_name: clientMap.get(user.client_id) || null,
+            association_name: associationMap.get(user.association_id) || null
+        }));
+        
+        // Return the users with all details
+        return usersWithDetails;
     } catch (error) {
         logger.error(`Error fetching users: ${error}`);
         throw new Error('Error fetching users');
     }
 }
+
+
+
 //FetchSpecificUserRoleForSelection
 async function FetchSpecificUserRoleForSelection() {
     try {
@@ -215,7 +281,7 @@ async function FetchSpecificUserRoleForSelection() {
 
            // Query to fetch all reseller_id and reseller_name
            const roles = await usersCollection.find(
-            { role_id: { $in: [1, 2] } }, // Filter to fetch role_id 1 and 2
+            { role_id: { $in: [1, 2] }, status: true }, // Filter to fetch role_id 1 and 2
             {
                 projection: {
                     role_id: 1,
@@ -239,7 +305,7 @@ async function FetchResellerForSelection() {
 
         // Query to fetch all reseller_id and reseller_name
         const resellers = await resellersCollection.find(
-            {}, // No filter to fetch all resellers
+            { status: true }, // Filter to fetch only resellers with status === true
             {
                 projection: {
                     reseller_id: 1,
@@ -262,8 +328,8 @@ async function CreateUser(req, res, next) {
         const { role_id, reseller_id,username, email_id, password, phone_no, wallet_bal, created_by } = req.body;
 
         // Validate the input
-        if (!username || !role_id || !email_id || !password || !created_by || !reseller_id) {
-            return res.status(400).json({ message: 'Username, Role ID, Email, reseller id ,Password, and Created By are required' });
+        if (!username || !role_id || !email_id || !password || !created_by) {
+            return res.status(400).json({ message: 'Username, Role ID, Email id ,Password, and Created By are required' });
         }
 
         const db = await database.connectToDatabase();
@@ -347,9 +413,9 @@ async function UpdateUser(req, res, next) {
                 $set: {
                     username: username,
                     phone_no: phone_no,
-                    wallet_bal: wallet_bal || existingUser.wallet_bal, 
+                    wallet_bal: wallet_bal, 
                     modified_date: new Date(),
-                    password: password,
+                    password: parseInt(password),
                     modified_by: modified_by,
                     status: status,
                 }
@@ -760,10 +826,12 @@ async function FetchChargerDetailsWithSession(req) {
                 $project: {
                     _id: 0,
                     chargerID: 1,
+                    status: 1,
                     sessiondata: 1
                 }
             }
         ]).toArray();
+
 
         if (!result || result.length === 0) {
             throw new Error('No chargers found for the specified reseller_id');
@@ -807,7 +875,8 @@ async function CreateReseller(req, res) {
         // Check if a reseller with the same phone number or email ID already exists
         const existingReseller = await resellerCollection.findOne({
             $or: [
-                { reseller_email_id: reseller_email_id }
+                { reseller_email_id: reseller_email_id },
+                {reseller_name: reseller_name}
             ]
         });
 

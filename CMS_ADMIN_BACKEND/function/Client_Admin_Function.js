@@ -511,12 +511,56 @@ async function FetchUser() {
     try {
         const db = await database.connectToDatabase();
         const usersCollection = db.collection("users");
+        const rolesCollection = db.collection("user_roles");
+        const resellerCollection = db.collection("reseller_details");
+        const clientCollection = db.collection("client_details");
+        const associationCollection = db.collection("association_details");
         
         // Query to fetch users with role_id 
         const users = await usersCollection.find({ role_id: { $in: [3, 4] } }).toArray();
 
-        // Return the users data
-        return users;
+        // Extract all unique role_ids, reseller_ids, client_ids, and association_ids from users
+        const roleIds = [...new Set(users.map(user => user.role_id))];
+        const resellerIds = [...new Set(users.map(user => user.reseller_id))];
+        const clientIds = [...new Set(users.map(user => user.client_id))];
+        const associationIds = [...new Set(users.map(user => user.association_id))];
+        
+        // Fetch roles based on role_ids
+        const roles = await rolesCollection.find({ role_id: { $in: roleIds } }).toArray();
+        const roleMap = new Map(roles.map(role => [role.role_id, role.role_name]));
+        
+        // Fetch resellers based on reseller_ids
+        let resellers,resellerMap;
+        if(resellerIds){
+            resellers = await resellerCollection.find({ reseller_id: { $in: resellerIds } }).toArray();
+            resellerMap = new Map(resellers.map(reseller => [reseller.reseller_id, reseller.reseller_name]));
+        }
+        
+        // Fetch clients based on client_ids
+        let clients,clientMap;
+        if(clientIds){
+            clients = await clientCollection.find({ client_id: { $in: clientIds } }).toArray();
+            clientMap = new Map(clients.map(client => [client.client_id, client.client_name]));
+        }
+        
+        // Fetch associations based on association_ids
+        let associations,associationMap;
+        if(associationIds){
+            associations = await associationCollection.find({ association_id: { $in: associationIds } }).toArray();
+            associationMap = new Map(associations.map(association => [association.association_id, association.association_name]));
+        }
+        
+        // Attach additional details to each user
+        const usersWithDetails = users.map(user => ({
+            ...user,
+            role_name: roleMap.get(user.role_id) || 'Unknown',
+            reseller_name: resellerMap.get(user.reseller_id) || null,
+            client_name: clientMap.get(user.client_id) || null,
+            association_name: associationMap.get(user.association_id) || null
+        }));
+        
+        // Return the users with all details
+        return usersWithDetails;
     } catch (error) {
         logger.error(`Error fetching users by role_id: ${error}`);
         throw new Error('Error fetching users by role_id');

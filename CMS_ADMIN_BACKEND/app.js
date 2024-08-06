@@ -31,7 +31,7 @@ app.use('/associationadmin', AssociationAdminRouter);
 const httpServer = http.createServer(app);
 
 // Define HTTP server port
-const HTTP_PORT = process.env.HTTP_PORT || 3000;    
+const HTTP_PORT = process.env.HTTP_PORT || 6778;    
 
 // Start the HTTP server
 httpServer.listen(HTTP_PORT, () => {

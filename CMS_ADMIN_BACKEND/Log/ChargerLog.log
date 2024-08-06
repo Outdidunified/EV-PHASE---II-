@@ -1282,3 +1282,371 @@
 06/07/2024 16:04:50 [INFO]: HTTP Server listening on port 4000
 06/07/2024 16:05:10 [INFO]: HTTP Server listening on port 4000
 06/07/2024 16:19:21 [INFO]: HTTP Server listening on port 4000
+10/07/2024 12:04:16 [INFO]: HTTP Server listening on port 6778
+11/07/2024 16:29:26 [INFO]: HTTP Server listening on port 6778
+15/07/2024 10:19:12 [INFO]: HTTP Server listening on port 6778
+15/07/2024 15:34:02 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+15/07/2024 15:34:05 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+15/07/2024 15:34:10 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+16/07/2024 15:27:00 [INFO]: HTTP Server listening on port 6778
+16/07/2024 15:29:09 [INFO]: HTTP Server listening on port 6778
+16/07/2024 15:29:48 [INFO]: HTTP Server listening on port 6778
+16/07/2024 15:30:29 [INFO]: HTTP Server listening on port 6778
+16/07/2024 15:31:07 [INFO]: HTTP Server listening on port 6778
+16/07/2024 15:32:59 [INFO]: HTTP Server listening on port 6778
+16/07/2024 15:35:48 [INFO]: HTTP Server listening on port 6778
+16/07/2024 16:20:13 [ERROR]: Error assigning chargers to reseller: Error: Failed to assign chargers to reseller
+16/07/2024 18:38:28 [ERROR]: Error fetching resellers: Error: read ECONNRESET
+16/07/2024 18:38:38 [ERROR]: Error fetching user roles: Error: read ECONNRESET
+16/07/2024 18:38:43 [ERROR]: Error fetching users: Error: read ECONNRESET
+16/07/2024 18:39:05 [ERROR]: Error fetching resellers: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-xadpoyl-shard-00-00.t16a63a.mongodb.net
+17/07/2024 10:24:06 [INFO]: HTTP Server listening on port 6778
+17/07/2024 10:46:55 [ERROR]: Error fetching resellers: Error: read ECONNRESET
+17/07/2024 17:02:27 [ERROR]: Error fetching users: MongoNetworkError: connect ETIMEDOUT 13.200.107.218:27017
+17/07/2024 17:02:51 [ERROR]: Error fetching users: MongoNetworkTimeoutError: connection timed out
+17/07/2024 17:03:09 [ERROR]: Error fetching user roles: MongoNetworkError: connect ETIMEDOUT 13.200.107.218:27017
+17/07/2024 17:03:19 [ERROR]: Error fetching client details: MongoNetworkError: read ECONNRESET
+18/07/2024 10:06:35 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+18/07/2024 11:31:03 [INFO]: HTTP Server listening on port 6778
+18/07/2024 15:47:34 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+18/07/2024 15:49:23 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+18/07/2024 17:24:11 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+18/07/2024 17:24:14 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+19/07/2024 14:13:53 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+19/07/2024 20:14:10 [ERROR]: Error assigning chargers to reseller: Error: Failed to assign chargers to reseller
+22/07/2024 11:58:13 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+22/07/2024 11:58:34 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+22/07/2024 11:59:28 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+22/07/2024 11:59:41 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+22/07/2024 12:00:21 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+22/07/2024 12:00:24 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+22/07/2024 12:00:52 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+23/07/2024 11:11:19 [INFO]: HTTP Server listening on port 6778
+23/07/2024 11:13:04 [INFO]: HTTP Server listening on port 6778
+23/07/2024 15:06:55 [ERROR]: Error in update client: Error: Client update fields are not available
+23/07/2024 15:07:08 [ERROR]: Error in update client: Error: Client update fields are not available
+23/07/2024 15:07:26 [ERROR]: Error in update client: Error: Client update fields are not available
+23/07/2024 15:07:44 [ERROR]: Error in update client: Error: Client update fields are not available
+23/07/2024 15:09:57 [ERROR]: Error in update client: Error: Client update fields are not available
+23/07/2024 15:10:29 [ERROR]: Error in update client: Error: Client update fields are not available
+23/07/2024 15:11:38 [ERROR]: Error in update client: Error: Client update fields are not available
+23/07/2024 15:12:29 [ERROR]: Error in update client: Error: Client update fields are not available
+23/07/2024 15:26:22 [ERROR]: Error in add new client: Error: Client with this email already exists
+23/07/2024 17:29:48 [ERROR]: Error in update client: Error: Client update fields are not available
+23/07/2024 17:30:16 [ERROR]: Error in update client: Error: Client update fields are not available
+23/07/2024 17:30:45 [ERROR]: Error in update client: Error: Client update fields are not available
+24/07/2024 15:39:55 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+24/07/2024 15:40:12 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+24/07/2024 15:44:49 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+24/07/2024 15:50:56 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+24/07/2024 17:08:53 [ERROR]: Error in update client: Error: Client update fields are not available
+24/07/2024 17:24:13 [ERROR]: Error in update client: Error: Client update fields are not available
+24/07/2024 17:29:36 [ERROR]: Error in update client: Error: Client update fields are not available
+24/07/2024 17:32:00 [ERROR]: Error in update client: Error: Client update fields are not available
+24/07/2024 17:32:35 [ERROR]: Error in update client: Error: Client update fields are not available
+24/07/2024 17:33:10 [ERROR]: Error in update client: Error: Client update fields are not available
+24/07/2024 17:34:03 [ERROR]: Error in update client: Error: Client update fields are not available
+24/07/2024 17:35:50 [ERROR]: Error in update client: Error: Client update fields are not available
+24/07/2024 17:52:03 [ERROR]: Error in update client: Error: Client update fields are not available
+24/07/2024 17:52:57 [ERROR]: Error in update client: Error: Client update fields are not available
+24/07/2024 17:54:27 [ERROR]: Error in update client: Error: Client update fields are not available
+24/07/2024 18:30:25 [ERROR]: Error in update client: Error: Client update fields are not available
+24/07/2024 18:31:01 [ERROR]: Error in update client: Error: Client update fields are not available
+24/07/2024 18:33:35 [ERROR]: Error in update client: Error: Client update fields are not available
+24/07/2024 18:36:03 [ERROR]: Error in update client: Error: Client not found to update
+24/07/2024 18:36:19 [ERROR]: Error in update client: Error: Client not found to update
+24/07/2024 18:37:12 [ERROR]: Error in update client: Error: Client not found to update
+24/07/2024 18:37:30 [ERROR]: Error in update client: Error: Client not found to update
+25/07/2024 10:12:59 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+25/07/2024 18:24:53 [INFO]: HTTP Server listening on port 6778
+26/07/2024 10:55:38 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+27/07/2024 11:52:37 [INFO]: HTTP Server listening on port 6778
+27/07/2024 12:25:04 [ERROR]: Error fetching users: Error: read ECONNRESET
+27/07/2024 12:25:04 [ERROR]: Error fetching users: Error: read ECONNRESET
+27/07/2024 12:25:47 [ERROR]: Error fetching users: MongoNetworkError: connect ETIMEDOUT 13.127.95.197:27017
+29/07/2024 15:15:52 [INFO]: HTTP Server listening on port 6778
+29/07/2024 15:17:40 [INFO]: HTTP Server listening on port 6778
+30/07/2024 11:50:56 [INFO]: HTTP Server listening on port 6778
+30/07/2024 11:54:35 [INFO]: HTTP Server listening on port 6778
+30/07/2024 11:55:31 [INFO]: HTTP Server listening on port 6778
+30/07/2024 11:58:43 [INFO]: HTTP Server listening on port 6778
+30/07/2024 11:59:01 [INFO]: HTTP Server listening on port 6778
+30/07/2024 12:00:23 [INFO]: HTTP Server listening on port 6778
+30/07/2024 12:03:49 [INFO]: HTTP Server listening on port 6778
+30/07/2024 12:04:41 [INFO]: HTTP Server listening on port 6778
+30/07/2024 12:08:17 [INFO]: HTTP Server listening on port 6778
+30/07/2024 12:09:03 [INFO]: HTTP Server listening on port 6778
+30/07/2024 12:11:43 [INFO]: HTTP Server listening on port 6778
+30/07/2024 12:16:32 [INFO]: HTTP Server listening on port 6778
+30/07/2024 12:17:37 [INFO]: HTTP Server listening on port 6778
+30/07/2024 14:39:53 [ERROR]: Error in add new client: Error: Client with this email already exists
+30/07/2024 14:41:40 [ERROR]: Error in add new client: Error: Client with this email already exists
+30/07/2024 15:10:33 [ERROR]: Error in add new client: Error: Client with this email already exists
+30/07/2024 15:11:58 [INFO]: HTTP Server listening on port 6778
+30/07/2024 15:14:16 [INFO]: HTTP Server listening on port 6778
+30/07/2024 15:45:01 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:45:05 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:45:05 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:45:06 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:45:07 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:45:16 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:45:18 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:45:51 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:45:54 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:45:55 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:45:56 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:45:57 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:45:57 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:45:59 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:46:01 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:46:02 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:46:02 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:46:07 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:46:10 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:46:11 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:46:12 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:46:12 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:46:12 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:46:12 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:46:12 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:46:13 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:46:13 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 15:46:13 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 16:14:34 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 16:15:03 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 16:15:05 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 16:15:31 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 16:15:34 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 16:15:34 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 16:15:35 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 16:15:35 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 16:15:47 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 16:17:48 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 16:18:04 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 16:18:52 [ERROR]: Error fetching users by role_id: ReferenceError: rolesCollection is not defined
+30/07/2024 16:19:38 [INFO]: HTTP Server listening on port 6778
+31/07/2024 14:32:47 [ERROR]: Error in add new client: Error: Client with this email already exists
+31/07/2024 15:04:32 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:04:37 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:04:41 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:04:45 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:04:56 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:05:00 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:05:10 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:05:19 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:05:24 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:05:29 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:05:34 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:05:39 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:05:44 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:05:49 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:05:53 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:05:57 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:15:36 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 15:24:45 [ERROR]: Error assigning chargers to reseller: Error: Failed to assign chargers to reseller
+31/07/2024 15:43:32 [INFO]: HTTP Server listening on port 6778
+31/07/2024 15:45:55 [INFO]: HTTP Server listening on port 6778
+31/07/2024 15:48:18 [INFO]: HTTP Server listening on port 6778
+31/07/2024 15:48:47 [INFO]: HTTP Server listening on port 6778
+31/07/2024 16:41:24 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+31/07/2024 18:19:06 [ERROR]: Error in add new client: Error: Client with this email already exists
+31/07/2024 19:16:32 [ERROR]: Error in add new client: Error: Client with this email already exists
+31/07/2024 19:17:21 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 11:14:42 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:00:25 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:01:03 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:04:49 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:07:34 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:09:35 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:10:32 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:18:01 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:18:08 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:19:18 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:19:24 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:20:06 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:20:07 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:30:51 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:33:34 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:34:25 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 12:35:42 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 15:36:22 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 15:36:53 [ERROR]: Error in add new client: Error: Client with this email already exists
+01/08/2024 15:38:27 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+01/08/2024 16:02:27 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+01/08/2024 16:04:43 [ERROR]: Error in add new client: Error: Client with this email already exists
+02/08/2024 12:08:27 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 15:11:24 [INFO]: HTTP Server listening on port 6778
+02/08/2024 15:11:34 [ERROR]: Error in add new client: Error: Client with this email already exists
+02/08/2024 15:11:38 [ERROR]: Error in add new client: Error: Client with this email already exists
+02/08/2024 16:13:21 [INFO]: HTTP Server listening on port 6778
+02/08/2024 17:13:01 [INFO]: HTTP Server listening on port 6778
+02/08/2024 17:13:09 [ERROR]: Error in update commission: ReferenceError: req is not defined
+02/08/2024 17:13:34 [INFO]: HTTP Server listening on port 6778
+02/08/2024 17:13:38 [ERROR]: Error in update commission: Error: Client update fields are not available
+02/08/2024 17:14:27 [INFO]: HTTP Server listening on port 6778
+02/08/2024 17:14:30 [ERROR]: Error in update commission: Error: Commission update fields are not available
+02/08/2024 17:15:00 [INFO]: HTTP Server listening on port 6778
+02/08/2024 17:15:32 [INFO]: HTTP Server listening on port 6778
+02/08/2024 18:19:33 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:19:39 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:19:48 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:19:55 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:20:00 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:20:04 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:20:17 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:20:20 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:20:34 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:20:39 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:20:45 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:20:52 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:21:01 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:21:07 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:21:13 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:21:19 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:21:25 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:21:30 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:21:35 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:21:40 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+02/08/2024 18:21:44 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+03/08/2024 17:53:44 [ERROR]: Error in add new client: Error: Client with this email already exists
+03/08/2024 17:53:48 [ERROR]: Error in add new client: Error: Client with this email already exists
+03/08/2024 18:09:18 [ERROR]: Error in add new client: Error: Client with this email already exists
+03/08/2024 18:11:33 [ERROR]: Error in add new client: Error: Client with this email already exists
+03/08/2024 18:11:56 [ERROR]: Error in add new client: Error: Client with this email already exists
+03/08/2024 18:12:22 [ERROR]: Error in add new client: Error: Client with this email already exists
+03/08/2024 18:12:38 [ERROR]: Error in add new client: Error: Client with this email already exists
+03/08/2024 18:12:47 [ERROR]: Error in add new client: Error: Client with this email already exists
+03/08/2024 18:12:51 [ERROR]: Error in add new client: Error: Client with this email already exists
+03/08/2024 18:13:04 [ERROR]: Error in add new client: Error: Client with this email already exists
+03/08/2024 18:15:19 [ERROR]: Error in add new client: Error: Client with this email already exists
+05/08/2024 10:50:41 [ERROR]: Error assigning chargers to reseller: Error: Failed to assign chargers to reseller
+05/08/2024 10:54:25 [ERROR]: Error in add new client: Error: Client with this email already exists
+05/08/2024 10:54:32 [ERROR]: Error in add new client: Error: Client with this email already exists
+05/08/2024 10:56:10 [ERROR]: Error in add new client: Error: Client with this email already exists
+05/08/2024 10:56:31 [ERROR]: Error in add new client: Error: Client with this email already exists
+05/08/2024 10:56:58 [ERROR]: Error in add new client: Error: Client with this email already exists
+05/08/2024 10:57:34 [ERROR]: Error in add new client: Error: Client with this email already exists
+05/08/2024 10:59:49 [ERROR]: Error in add new client: Error: Client with this email already exists
+05/08/2024 11:00:07 [INFO]: HTTP Server listening on port 6778
+05/08/2024 11:00:11 [ERROR]: Error in add new client: Error: Client with this email already exists
+05/08/2024 11:02:28 [INFO]: HTTP Server listening on port 6778
+05/08/2024 11:02:33 [ERROR]: Error in add new client: Error: Client with this email already exists
+05/08/2024 11:04:49 [INFO]: HTTP Server listening on port 6778
+05/08/2024 11:04:56 [ERROR]: Error in add new client: Error: Client with this email already exists
+05/08/2024 11:15:30 [INFO]: HTTP Server listening on port 6778
+05/08/2024 11:45:51 [INFO]: HTTP Server listening on port 6778
+05/08/2024 11:56:26 [ERROR]: Error in add new client: Error: Client with this email already exists
+05/08/2024 11:59:01 [INFO]: HTTP Server listening on port 6778
+05/08/2024 12:00:45 [INFO]: HTTP Server listening on port 6778
+05/08/2024 12:25:23 [INFO]: HTTP Server listening on port 6778
+05/08/2024 12:34:55 [INFO]: HTTP Server listening on port 6778
+05/08/2024 12:42:53 [INFO]: HTTP Server listening on port 6778
+05/08/2024 12:44:34 [INFO]: HTTP Server listening on port 6778
+05/08/2024 12:51:30 [INFO]: HTTP Server listening on port 6778
+05/08/2024 12:52:17 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:52:17 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:21 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:21 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:21 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:22 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:22 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:22 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:22 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:23 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:23 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:23 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:24 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:24 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:24 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:24 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:24 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:25 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:25 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:25 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:25 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:25 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:26 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:26 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:26 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:26 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:27 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:27 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:27 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:27 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:27 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:28 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:28 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:28 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:28 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:28 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:29 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:29 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:29 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:29 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:29 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:30 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:30 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:30 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:30 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:31 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:31 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:31 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:31 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:32 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:32 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:32 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:32 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:33 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:33 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:33 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:33 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:33 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:34 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:34 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:34 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:34 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:34 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:35 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:35 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:35 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:35 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:35 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:36 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:36 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:36 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:36 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:37 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:37 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:37 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:37 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:37 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:38 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:38 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:38 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:38 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:38 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:39 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:39 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:53:39 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:54:30 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:54:31 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:54:36 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:54:40 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:54:40 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:54:51 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:54:51 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:56:08 [INFO]: HTTP Server listening on port 6778
+05/08/2024 12:56:11 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:56:11 [ERROR]: Error fetching clients: TypeError: Cannot read properties of undefined (reading 'reseller_id')
+05/08/2024 12:57:12 [INFO]: HTTP Server listening on port 6778
+05/08/2024 14:22:39 [ERROR]: Error assigning chargers to reseller: Error: Failed to assign chargers to reseller
+05/08/2024 14:26:45 [ERROR]: Error in add new client: Error: Client with this email already exists
+05/08/2024 14:31:09 [ERROR]: Error in add new client: Error: Client with this email already exists
+05/08/2024 16:24:46 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+05/08/2024 16:25:40 [ERROR]: Error assigning chargers to reseller: Error: Failed to assign chargers to reseller
+05/08/2024 16:52:46 [INFO]: HTTP Server listening on port 6778
+05/08/2024 16:53:48 [INFO]: HTTP Server listening on port 6778
+05/08/2024 16:54:53 [INFO]: HTTP Server listening on port 6778
+06/08/2024 10:32:52 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+06/08/2024 10:55:14 [INFO]: HTTP Server listening on port 6778
+06/08/2024 11:00:33 [INFO]: HTTP Server listening on port 6778

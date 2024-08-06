@@ -126,7 +126,7 @@ async function FetchChargerDetailsWithSession(req) {
         throw error;
     }
 }
-//Createclient
+//Create client
 async function addNewClient(req){
     try{
         const{reseller_id,client_name,client_phone_no,client_email_id,client_address,created_by} = req.body;
@@ -137,10 +137,18 @@ async function addNewClient(req){
         const db = await database.connectToDatabase();
         const clientCollection = db.collection("client_details");
 
+        if(!reseller_id && !client_name && !client_phone_no && !client_email_id && !client_address && !created_by){
+            const error = new Error('Required fields are missing !');
+            error.statusCode = 409; // Conflict
+            throw error;
+        }
+
         // Check if client_email_id is already in use
         const existingClient = await clientCollection.findOne({ client_email_id });
         if (existingClient) {
-            throw new Error('Client with this email already exists');
+            const error = new Error('Client with this email already exists');
+            error.statusCode = 409; // Conflict
+            throw error;
         }
         
 
@@ -182,6 +190,39 @@ async function addNewClient(req){
         throw new Error(error.message)
     }
 }
+
+async function updateCommission(req){
+    try{
+        const{chargerID,reseller_commission,modified_by} = req.body;
+        const db = await database.connectToDatabase();
+        const ChargerCollection = db.collection("charger_details");
+
+        if(!chargerID || reseller_commission === undefined || !modified_by){
+            throw new Error(`Commission update fields are not available`);
+        }
+        const where = { charger_id: chargerID };
+        const update = {
+            $set: {
+                reseller_commission: reseller_commission,
+                modified_by: modified_by,
+                modified_date: new Date()
+            }
+        };
+
+        const result = await ChargerCollection.updateOne(where, update);
+
+        if (result.modifiedCount === 0) {
+            throw new Error(`Record not found to update reseller commission`);
+        }
+
+        return true;
+
+    }catch(error){
+        logger.error(`Error in update commission: ${error}`);
+        throw new Error(error.message)
+    }
+}
+
 //UpdateClient
 async function updateClient(req){
     try{
@@ -259,16 +300,64 @@ async function DeActivateClient(req, res,next) {
 
 // USER Functions
 //FetchUser
-async function FetchUser() {
+async function FetchUser(req,res) {
     try {
+        const reseller_id = req.body.reseller_id;
+        if(!reseller_id){
+            return res.status(409).json({ message: 'Reseller ID is Empty !' });
+        }
         const db = await database.connectToDatabase();
         const usersCollection = db.collection("users");
+        const rolesCollection = db.collection("user_roles");
+        const resellerCollection = db.collection("reseller_details");
+        const clientCollection = db.collection("client_details");
+        const associationCollection = db.collection("association_details");
         
         // Query to fetch users with role_id 1 or 2
-        const users = await usersCollection.find({ role_id: { $in: [2, 3] } }).toArray();
+        const users = await usersCollection.find({ reseller_id }).toArray();
 
-        // Return the users data
-        return users;
+        // Extract all unique role_ids, reseller_ids, client_ids, and association_ids from users
+        const roleIds = [...new Set(users.map(user => user.role_id))];
+        const resellerIds = [...new Set(users.map(user => user.reseller_id))];
+        const clientIds = [...new Set(users.map(user => user.client_id))];
+        const associationIds = [...new Set(users.map(user => user.association_id))];
+        
+        // Fetch roles based on role_ids
+        const roles = await rolesCollection.find({ role_id: { $in: roleIds } }).toArray();
+        const roleMap = new Map(roles.map(role => [role.role_id, role.role_name]));
+        
+        // Fetch resellers based on reseller_ids
+        let resellers,resellerMap;
+        if(resellerIds){
+            resellers = await resellerCollection.find({ reseller_id: { $in: resellerIds } }).toArray();
+            resellerMap = new Map(resellers.map(reseller => [reseller.reseller_id, reseller.reseller_name]));
+        }
+        
+        // Fetch clients based on client_ids
+        let clients,clientMap;
+        if(clientIds){
+            clients = await clientCollection.find({ client_id: { $in: clientIds } }).toArray();
+            clientMap = new Map(clients.map(client => [client.client_id, client.client_name]));
+        }
+        
+        // Fetch associations based on association_ids
+        let associations,associationMap;
+        if(associationIds){
+            associations = await associationCollection.find({ association_id: { $in: associationIds } }).toArray();
+            associationMap = new Map(associations.map(association => [association.association_id, association.association_name]));
+        }
+        
+        // Attach additional details to each user
+        const usersWithDetails = users.map(user => ({
+            ...user,
+            role_name: roleMap.get(user.role_id) || 'Unknown',
+            reseller_name: resellerMap.get(user.reseller_id) || null,
+            client_name: clientMap.get(user.client_id) || null,
+            association_name: associationMap.get(user.association_id) || null
+        }));
+        
+        // Return the users with all details
+        return usersWithDetails;
     } catch (error) {
         logger.error(`Error fetching users by role_id: ${error}`);
         throw new Error('Error fetching users by role_id');
@@ -299,14 +388,21 @@ async function FetchSpecificUserRoleForSelection() {
     }
 }
 // FetchClientForSelection
-async function FetchClientForSelection() {
+async function FetchClientForSelection(req,res) {
     try {
+        const reseller_id = req.body.reseller_id;
+        if(!reseller_id){
+            return res.status(409).json({ message: 'Reseller ID is Empty !' });
+        }
         const db = await database.connectToDatabase();
         const resellersCollection = db.collection("client_details");
 
         // Query to fetch all reseller_id and reseller_name
         const resellers = await resellersCollection.find(
-            {}, // No filter to fetch all resellers
+            { 
+                status: true,
+                reseller_id: reseller_id // Filter by specific reseller_id
+            },
             {
                 projection: {
                     client_id: 1,
@@ -869,4 +965,5 @@ module.exports = {
         FetchUserProfile,
         UpdateUserProfile,
         UpdateResellerProfile,
+        updateCommission
  }
