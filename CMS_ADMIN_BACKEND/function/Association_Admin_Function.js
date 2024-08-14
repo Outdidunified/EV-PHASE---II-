@@ -601,12 +601,34 @@ async function FetchUsersWithSpecificRolesToUnAssgin(req, res) {
 
         const db = await database.connectToDatabase();
         const usersCollection = db.collection("users");
+        
+        // Aggregation pipeline
+        const users = await usersCollection.aggregate([
+            {
+                $match: {
+                    role_id: { $nin: [1, 2, 3, 4] },
+                    association_id: association_id
+                }
+            },
+            {
+                $lookup: {
+                    from: "user_roles", // Collection to join with
+                    localField: "role_id", // Field from users collection
+                    foreignField: "role_id", // Field from user_roles collection
+                    as: "roleDetails" // Output array field
+                }
+            },
+            {
+                $unwind: "$roleDetails" // Deconstruct the array
+            },
+            {
+                $addFields: {
+                    role_name: "$roleDetails.role_name" // Add role_name field from roleDetails
+                }
+            }
+        ]).toArray();
 
-        // Query to find users with role_id not in [1, 2, 3, 4] and association_id matches
-        const users = await usersCollection.find({
-            role_id: { $nin: [1, 2, 3, 4] },
-            association_id: association_id
-        }).toArray();
+        console.log(users);
 
         if (!users || users.length === 0) {
             return res.status(404).json({ message: 'No users found' });
@@ -619,6 +641,7 @@ async function FetchUsersWithSpecificRolesToUnAssgin(req, res) {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 }
+
 // RemoveUserFromAssociation
 async function RemoveUserFromAssociation(req, res) {
     try {
