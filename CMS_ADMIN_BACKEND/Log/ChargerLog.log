@@ -1650,3 +1650,133 @@
 06/08/2024 10:32:52 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
 06/08/2024 10:55:14 [INFO]: HTTP Server listening on port 6778
 06/08/2024 11:00:33 [INFO]: HTTP Server listening on port 6778
+06/08/2024 11:04:08 [INFO]: HTTP Server listening on port 6778
+06/08/2024 11:52:16 [ERROR]: Error in add new client: Error: Client with this email already exists
+06/08/2024 11:54:13 [ERROR]: Error in add new client: Error: Client with this email already exists
+06/08/2024 11:54:16 [ERROR]: Error in add new client: Error: Client with this email already exists
+06/08/2024 12:01:35 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+06/08/2024 12:17:23 [ERROR]: Error in add new client: Error: Client with this email already exists
+06/08/2024 14:44:03 [INFO]: HTTP Server listening on port 6778
+06/08/2024 14:45:57 [INFO]: HTTP Server listening on port 6778
+06/08/2024 14:47:06 [INFO]: HTTP Server listening on port 6778
+06/08/2024 14:48:26 [INFO]: HTTP Server listening on port 6778
+06/08/2024 14:49:18 [ERROR]: Error fetching users: Error: read ECONNRESET
+06/08/2024 14:49:18 [ERROR]: Error fetching users: Error: read ECONNRESET
+06/08/2024 14:49:18 [ERROR]: Error fetching resellers: Error: read ECONNRESET
+06/08/2024 14:49:40 [ERROR]: Error fetching users: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-xadpoyl-shard-00-01.t16a63a.mongodb.net
+06/08/2024 14:49:40 [ERROR]: Error fetching users: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-xadpoyl-shard-00-01.t16a63a.mongodb.net
+06/08/2024 14:49:40 [ERROR]: Error fetching resellers: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-xadpoyl-shard-00-01.t16a63a.mongodb.net
+06/08/2024 14:49:41 [ERROR]: Error fetching users: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-xadpoyl-shard-00-01.t16a63a.mongodb.net
+06/08/2024 14:49:41 [ERROR]: Error fetching resellers: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-xadpoyl-shard-00-01.t16a63a.mongodb.net
+06/08/2024 14:49:41 [ERROR]: Error fetching users: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-xadpoyl-shard-00-01.t16a63a.mongodb.net
+06/08/2024 15:05:27 [INFO]: HTTP Server listening on port 6778
+06/08/2024 15:05:54 [INFO]: HTTP Server listening on port 6778
+06/08/2024 15:06:50 [INFO]: HTTP Server listening on port 6778
+06/08/2024 15:13:12 [INFO]: HTTP Server listening on port 6778
+06/08/2024 15:18:40 [INFO]: HTTP Server listening on port 6778
+06/08/2024 15:40:17 [INFO]: HTTP Server listening on port 6778
+06/08/2024 17:34:46 [ERROR]: Error in add new client: Error: Client with this email already exists
+07/08/2024 15:48:00 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+07/08/2024 18:08:21 [INFO]: HTTP Server listening on port 6778
+07/08/2024 18:10:17 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:04:55 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:15:12 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:17:11 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:17:49 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:22:03 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:23:30 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:24:52 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:31:39 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:32:27 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:32:31 [ERROR]: Error fetching associations: TypeError: Cannot read properties of undefined (reading 'client_id')
+08/08/2024 12:32:31 [ERROR]: Error fetching associations: TypeError: Cannot read properties of undefined (reading 'client_id')
+08/08/2024 12:33:30 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:33:32 [ERROR]: Error fetching associations: TypeError: Cannot read properties of undefined (reading 'client_id')
+08/08/2024 12:33:32 [ERROR]: Error fetching associations: TypeError: Cannot read properties of undefined (reading 'client_id')
+08/08/2024 12:33:38 [ERROR]: Error fetching associations: TypeError: Cannot read properties of undefined (reading 'client_id')
+08/08/2024 12:33:38 [ERROR]: Error fetching associations: TypeError: Cannot read properties of undefined (reading 'client_id')
+08/08/2024 12:34:51 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:35:03 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:35:04 [ERROR]: Error fetching associations: TypeError: Cannot read properties of undefined (reading 'client_id')
+08/08/2024 12:35:04 [ERROR]: Error fetching associations: TypeError: Cannot read properties of undefined (reading 'client_id')
+08/08/2024 12:35:17 [ERROR]: Error fetching associations: TypeError: Cannot read properties of undefined (reading 'client_id')
+08/08/2024 12:35:17 [ERROR]: Error fetching associations: TypeError: Cannot read properties of undefined (reading 'client_id')
+08/08/2024 12:35:30 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:36:20 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:36:50 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:39:29 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:40:37 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:40:56 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:41:42 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:48:53 [INFO]: HTTP Server listening on port 6778
+08/08/2024 12:49:21 [INFO]: HTTP Server listening on port 6778
+08/08/2024 14:26:22 [INFO]: HTTP Server listening on port 6778
+08/08/2024 14:44:01 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+08/08/2024 16:31:28 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:05:27 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+08/08/2024 17:10:02 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:10:11 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:12:05 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:12:24 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:14:11 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:16:47 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:18:10 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:18:35 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:19:31 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:22:06 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:22:11 [ERROR]: Error fetching clients: MongoServerError: BSON field 'distinct.key' is the wrong type 'object', expected type 'string'
+08/08/2024 17:23:26 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:24:34 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:25:14 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:26:11 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:27:40 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:27:41 [ERROR]: Error fetching clients: MongoServerError: BSON field 'distinct.key' is the wrong type 'object', expected type 'string'
+08/08/2024 17:28:04 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:28:05 [ERROR]: Error fetching clients: MongoServerError: BSON field 'distinct.key' is the wrong type 'object', expected type 'string'
+08/08/2024 17:28:16 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:28:20 [ERROR]: Error fetching clients: MongoServerError: BSON field 'distinct.key' is the wrong type 'object', expected type 'string'
+08/08/2024 17:28:49 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:28:56 [ERROR]: Error fetching clients: MongoServerError: BSON field 'distinct.key' is the wrong type 'object', expected type 'string'
+08/08/2024 17:30:16 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:32:00 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:33:41 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:45:17 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:45:33 [INFO]: HTTP Server listening on port 6778
+08/08/2024 17:58:07 [INFO]: HTTP Server listening on port 6778
+08/08/2024 18:02:45 [INFO]: HTTP Server listening on port 6778
+08/08/2024 18:04:46 [INFO]: HTTP Server listening on port 6778
+08/08/2024 18:05:53 [ERROR]: Error in add new client: Error: Client with this email already exists
+08/08/2024 18:06:12 [ERROR]: Error in add new client: Error: Client with this email already exists
+08/08/2024 18:06:32 [INFO]: HTTP Server listening on port 6778
+08/08/2024 18:06:34 [ERROR]: Error in add new client: Error: Client with this client name / email id already exists
+09/08/2024 11:12:30 [ERROR]: Error in add new client: Error: Client with this client name / email id already exists
+09/08/2024 11:12:39 [ERROR]: Error in add new client: Error: Client with this client name / email id already exists
+09/08/2024 11:12:58 [ERROR]: Error in add new client: Error: Client with this client name / email id already exists
+09/08/2024 11:14:08 [ERROR]: Error in add new client: Error: Client with this client name / email id already exists
+09/08/2024 11:14:18 [ERROR]: Error in add new client: Error: Client with this client name / email id already exists
+09/08/2024 11:14:21 [ERROR]: Error in add new client: Error: Client with this client name / email id already exists
+09/08/2024 11:14:23 [ERROR]: Error in add new client: Error: Client with this client name / email id already exists
+09/08/2024 11:28:41 [INFO]: HTTP Server listening on port 6778
+09/08/2024 11:33:29 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+09/08/2024 11:43:09 [INFO]: HTTP Server listening on port 6778
+09/08/2024 11:44:39 [INFO]: HTTP Server listening on port 6778
+09/08/2024 11:50:17 [INFO]: HTTP Server listening on port 6778
+09/08/2024 13:00:42 [INFO]: HTTP Server listening on port 6778
+09/08/2024 13:02:38 [INFO]: HTTP Server listening on port 6778
+09/08/2024 13:03:30 [INFO]: HTTP Server listening on port 6778
+09/08/2024 13:04:30 [INFO]: HTTP Server listening on port 6778
+09/08/2024 13:05:19 [INFO]: HTTP Server listening on port 6778
+09/08/2024 13:06:38 [INFO]: HTTP Server listening on port 6778
+09/08/2024 13:06:40 [ERROR]: Error fetching client details: ReferenceError: reseller_name is not defined
+09/08/2024 13:07:58 [INFO]: HTTP Server listening on port 6778
+09/08/2024 13:08:45 [INFO]: HTTP Server listening on port 6778
+09/08/2024 13:09:05 [INFO]: HTTP Server listening on port 6778
+09/08/2024 13:10:57 [INFO]: HTTP Server listening on port 6778
+09/08/2024 14:55:50 [INFO]: HTTP Server listening on port 6778
+09/08/2024 14:58:21 [ERROR]: Error in add new client: Error: Client with this client name / email id already exists
+09/08/2024 14:59:30 [ERROR]: Error in add new client: Error: Client with this client name / email id already exists
+09/08/2024 15:00:44 [INFO]: HTTP Server listening on port 6778
+09/08/2024 15:02:38 [INFO]: HTTP Server listening on port 6778
+09/08/2024 17:02:59 [ERROR]: Error fetching charger details: No chargers found for the specified reseller_id
+09/08/2024 17:20:13 [ERROR]: Error in add new client: Error: Client with this client name / email id already exists
+10/08/2024 11:39:10 [INFO]: HTTP Server listening on port 6778

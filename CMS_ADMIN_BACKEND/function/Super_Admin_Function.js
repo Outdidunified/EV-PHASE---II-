@@ -26,7 +26,7 @@ async function FetchSpecificUserRole() {
         
         // Query to fetch roles with role_name either "superadmin" or "reselleradmin"
         const user_roles = await usersCollection.find({ 
-            role_name: { $in: ["superadmin", "reselleradmin"] } 
+            role_id: { $in: [1,2] } 
         }).toArray();
 
         // Return the role data
@@ -300,12 +300,20 @@ async function FetchSpecificUserRoleForSelection() {
 // FetchResellerForSelection
 async function FetchResellerForSelection() {
     try {
+        // Connect to the database
         const db = await database.connectToDatabase();
         const resellersCollection = db.collection("reseller_details");
+        const usersCollection = db.collection("users");
 
-        // Query to fetch all reseller_id and reseller_name
+        // Fetch all reseller_id from the users table
+        const userResellerIds = await usersCollection.distinct("reseller_id");
+
+        // Query to fetch resellers not present in the users table
         const resellers = await resellersCollection.find(
-            { status: true }, // Filter to fetch only resellers with status === true
+            { 
+                status: true, 
+                reseller_id: { $nin: userResellerIds } // Exclude resellers already present in users table
+            },
             {
                 projection: {
                     reseller_id: 1,
@@ -315,13 +323,14 @@ async function FetchResellerForSelection() {
             }
         ).toArray();
 
-        // Return the resellers data
+        // Return the filtered resellers data
         return resellers;
     } catch (error) {
         logger.error(`Error fetching resellers: ${error}`);
         throw new Error('Error fetching resellers');
     }
 }
+
 // Create User
 async function CreateUser(req, res, next) {
     try {
@@ -872,16 +881,16 @@ async function CreateReseller(req, res) {
         const db = await database.connectToDatabase();
         const resellerCollection = db.collection("reseller_details");
 
-        // Check if a reseller with the same phone number or email ID already exists
+        // Check if a reseller with the same user name or email ID already exists
         const existingReseller = await resellerCollection.findOne({
             $or: [
-                { reseller_email_id: reseller_email_id },
+                {reseller_email_id: reseller_email_id},
                 {reseller_name: reseller_name}
             ]
         });
 
         if (existingReseller) {
-            return res.status(400).json({ message: 'Reseller already exists' });
+            return res.status(400).json({ message: 'Reseller name / Mail ID already exists' });
         }
 
         // Use aggregation to fetch the highest reseller_id

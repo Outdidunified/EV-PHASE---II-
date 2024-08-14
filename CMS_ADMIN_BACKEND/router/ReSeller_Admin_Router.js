@@ -155,7 +155,8 @@ router.post('/FetchClientForSelection', async (req, res) => {
     } catch (error) {
         console.error('Error in FetchClientForSelection route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to FetchClientForSelection ' });
-}});
+    }
+});
 // Route to CreateUser
 router.post('/CreateUser', functions.CreateUser, (req, res) => {
     res.status(200).json({ status: 'Success' ,message: 'New user created successfully' });

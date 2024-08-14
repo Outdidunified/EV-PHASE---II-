@@ -9,16 +9,51 @@ async function FetchAssociationUser(req, res) {
         const db = await database.connectToDatabase();
         const associationCollection = db.collection("association_details");
 
+        // Fetch association details for the given client_id
         const users = await associationCollection.find({ client_id: parseInt(client_id) }).toArray();
+        
+        if (users.length === 0) {
+            return res.status(404).json({ message: "No association found for the provided client_id." });
+        }
 
-        return users;
+        const reseller_ids = users.map(user => user.reseller_id);
+        const client_ids = users.map(user => user.client_id);
+
+        // Fetch reseller details
+        const resellerCollection = db.collection("reseller_details");
+        const resellers = await resellerCollection.find({ reseller_id: { $in: reseller_ids } }).toArray();
+
+        // Fetch client details
+        const clientCollection = db.collection("client_details");  // Assuming 'client_details' is the correct collection name
+        const clients = await clientCollection.find({ client_id: { $in: client_ids } }).toArray();
+
+        // Map resellers and clients by their IDs for quick lookup
+        const resellerMap = resellers.reduce((acc, reseller) => {
+            acc[reseller.reseller_id] = reseller.reseller_name;
+            return acc;
+        }, {});
+
+        const clientMap = clients.reduce((acc, client) => {
+            acc[client.client_id] = client.client_name;
+            return acc;
+        }, {});
+
+        // Attach names to users
+        const result = users.map(user => ({
+            ...user,
+            reseller_name: resellerMap[user.reseller_id] || 'Unknown Reseller',
+            client_name: clientMap[user.client_id] || 'Unknown Client'
+        }));
+
+        return result;
 
     } catch (error) {
         console.error(`Error fetching client details: ${error}`);
         logger.error(`Error fetching client details: ${error}`);
-        throw new Error('Error fetching client details');
+        return res.status(500).json({ message: 'Error fetching client details' });
     }
 }
+
 // FetchChargerDetailsWithSession
 async function FetchChargerDetailsWithSession(req) {
     try {
@@ -121,9 +156,15 @@ async function CreateAssociationUser(req, res, next) {
         const associationCollection = db.collection("association_details");
 
         // Check if the association email already exists
-        const existingAssociation = await associationCollection.findOne({ association_email_id: association_email_id });
+        const existingAssociation = await associationCollection.findOne({
+            $or: [
+                { association_email_id: association_email_id },
+                { association_name: association_name }
+            ]
+        });
+
         if (existingAssociation) {
-            return res.status(400).json({ message: 'Association with this Email ID already exists' });
+            return res.status(400).json({ message: 'Association with this Association name / Email ID already exists' });
         }
 
         // Use aggregation to fetch the highest association_id
@@ -507,8 +548,12 @@ async function DeActivateOrActivateCharger(req, res, next) {
 
 // USER Functions
 //FetchUser
-async function FetchUser() {
+async function FetchUser(req, res) {
     try {
+        const client_id = req.body.client_id;
+        if(!client_id){
+            return res.status(409).json({ message: 'Client ID is Empty !' });
+        }
         const db = await database.connectToDatabase();
         const usersCollection = db.collection("users");
         const rolesCollection = db.collection("user_roles");
@@ -517,7 +562,7 @@ async function FetchUser() {
         const associationCollection = db.collection("association_details");
         
         // Query to fetch users with role_id 
-        const users = await usersCollection.find({ role_id: { $in: [3, 4] } }).toArray();
+        const users = await usersCollection.find({ role_id: { $in: [3, 4] }, client_id }).toArray();
 
         // Extract all unique role_ids, reseller_ids, client_ids, and association_ids from users
         const roleIds = [...new Set(users.map(user => user.role_id))];
@@ -574,7 +619,7 @@ async function FetchSpecificUserRoleForSelection() {
 
         // Query to fetch all reseller_id and reseller_name
         const roles = await usersCollection.find(
-        { role_id: { $in: [4] } }, // Filter to fetch role_id 1 and 2
+        { role_id: { $in: [4] }, status: true }, // Filter to fetch role_id 1 and 2
         {
             projection: {
                 role_id: 1,
@@ -591,14 +636,27 @@ async function FetchSpecificUserRoleForSelection() {
     }
 }
 // FetchAssociationForSelection
-async function FetchAssociationForSelection() {
+async function FetchAssociationForSelection(req,res) {
     try {
+        const client_id = req.body.client_id;
+        if (!client_id) {
+            return res.status(409).json({ message: 'Client ID is Empty!' });
+        }
+
         const db = await database.connectToDatabase();
-        const resellersCollection = db.collection("association_details");
+        const associationsCollection = db.collection("association_details");
+        const usersCollection = db.collection("users");
+
+        // Fetch all association_id from the users table
+        const userAssociationIds = await usersCollection.distinct("association_id");
 
         // Query to fetch all reseller_id and reseller_name
-        const resellers = await resellersCollection.find(
-            {}, // No filter to fetch all resellers
+        const resellers = await associationsCollection.find(
+            {
+                status: true,
+                client_id: client_id,
+                association_id: { $nin: userAssociationIds } 
+            },
             {
                 projection: {
                     association_id: 1,
@@ -711,6 +769,7 @@ async function UpdateUser(req, res, next) {
                     modified_date: new Date(),
                     modified_by: modified_by,
                     status: status,
+                    password: password
                 }
             }
         );

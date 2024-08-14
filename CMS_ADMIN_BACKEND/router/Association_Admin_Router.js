@@ -55,10 +55,10 @@ router.post('/UpdateAssociationProfile',functions.UpdateAssociationProfile, asyn
 
 // MANAGE USER Routes
 // Route to FetchUser
-router.get('/FetchUsers', async (req, res) => {
+router.post('/FetchUsers', async (req, res) => {
     try {
         // Call FetchUser function to get users data
-        const user = await functions.FetchUser();
+        const user = await functions.FetchUser(req, res);
         // Send response with users data
         res.status(200).json({ status: 'Success', data: user });
         

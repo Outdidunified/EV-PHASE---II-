@@ -144,9 +144,14 @@ async function addNewClient(req){
         }
 
         // Check if client_email_id is already in use
-        const existingClient = await clientCollection.findOne({ client_email_id });
+        const existingClient = await clientCollection.findOne({ 
+            $or: [
+                { client_email_id: client_email_id },
+                { client_name: client_name }
+            ]
+        });
         if (existingClient) {
-            const error = new Error('Client with this email already exists');
+            const error = new Error('Client with this client name / email id already exists');
             error.statusCode = 409; // Conflict
             throw error;
         }
@@ -314,7 +319,7 @@ async function FetchUser(req,res) {
         const associationCollection = db.collection("association_details");
         
         // Query to fetch users with role_id 1 or 2
-        const users = await usersCollection.find({ reseller_id }).toArray();
+        const users = await usersCollection.find({ role_id: { $in: [2,3] }, reseller_id }).toArray();
 
         // Extract all unique role_ids, reseller_ids, client_ids, and association_ids from users
         const roleIds = [...new Set(users.map(user => user.role_id))];
@@ -371,7 +376,7 @@ async function FetchSpecificUserRoleForSelection() {
 
            // Query to fetch all reseller_id and reseller_name
            const roles = await usersCollection.find(
-            { role_id: { $in: [3] } }, // Filter to fetch role_id 1 and 2
+            { role_id: { $in: [3] }, status: true }, // Filter to fetch role_id 1 and 2
             {
                 projection: {
                     role_id: 1,
@@ -388,20 +393,28 @@ async function FetchSpecificUserRoleForSelection() {
     }
 }
 // FetchClientForSelection
-async function FetchClientForSelection(req,res) {
+async function FetchClientForSelection(req, res) {
     try {
+        // Get the reseller_id from the request body
         const reseller_id = req.body.reseller_id;
-        if(!reseller_id){
-            return res.status(409).json({ message: 'Reseller ID is Empty !' });
+        if (!reseller_id) {
+            return res.status(409).json({ message: 'Reseller ID is Empty!' });
         }
-        const db = await database.connectToDatabase();
-        const resellersCollection = db.collection("client_details");
 
-        // Query to fetch all reseller_id and reseller_name
-        const resellers = await resellersCollection.find(
-            { 
+        // Connect to the database
+        const db = await database.connectToDatabase();
+        const clientsCollection = db.collection("client_details");
+        const usersCollection = db.collection("users");
+
+        // Fetch all reseller_id from the users table
+        const userClientIds = await usersCollection.distinct("client_id");
+
+        // Query to fetch the specified client_id but exclude those already in users table
+        const clients = await clientsCollection.find(
+            {
                 status: true,
-                reseller_id: reseller_id // Filter by specific reseller_id
+                reseller_id: reseller_id,
+                client_id: { $nin: userClientIds } // Exclude clients whose client_id is in the list from the users table
             },
             {
                 projection: {
@@ -412,13 +425,14 @@ async function FetchClientForSelection(req,res) {
             }
         ).toArray();
 
-        // Return the resellers data
-        return resellers;
+        return clients;
     } catch (error) {
+        // Log the error
         logger.error(`Error fetching clients: ${error}`);
         throw new Error('Error fetching clients');
     }
 }
+
 // Create User
 async function CreateUser(req, res, next) {
     try {
@@ -513,6 +527,7 @@ async function UpdateUser(req, res, next) {
                     wallet_bal: wallet_bal || existingUser.wallet_bal, 
                     modified_date: new Date(),
                     modified_by: modified_by,
+                    password: password,
                     status: status,
                 }
             }

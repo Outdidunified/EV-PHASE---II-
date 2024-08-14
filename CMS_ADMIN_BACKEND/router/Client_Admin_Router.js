@@ -55,10 +55,10 @@ router.post('/UpdateClientProfile',functions.UpdateClientProfile, async (req, re
 
 // MANAGE USER Routes
 // Route to FetchUser
-router.get('/FetchUsers', async (req, res) => {
+router.post('/FetchUsers', async (req, res) => {
     try {
         // Call FetchUser function to get users data
-        const user = await functions.FetchUser();
+        const user = await functions.FetchUser(req,res);
         // Send response with users data
         res.status(200).json({ status: 'Success', data: user });
         
@@ -79,7 +79,7 @@ router.get('/FetchSpecificUserRoleForSelection', async (req, res) => {
         res.status(500).json({ status: 'Failed', message: 'Failed to FetchSpecificUserForCreateSelection ' });
 }});
 // Route to FetchAssociationForSelection 
-router.get('/FetchAssociationForSelection', async (req, res) => {
+router.post('/FetchAssociationForSelection', async (req, res) => {
     try {
         // Call FetchUser function to get users data
         const user = await functions.FetchAssociationForSelection(req, res);

@@ -147,8 +147,12 @@ async function UpdateAssociationProfile(req, res, next) {
 
 // USER Functions
 //FetchUser
-async function FetchUser() {
+async function FetchUser(req, res) {
     try {
+        const association_id = req.body.association_id;
+        if(!association_id){
+            return res.status(409).json({ message: 'Association ID is Empty!' });
+        }
         const db = await database.connectToDatabase();
         const usersCollection = db.collection("users");
         const rolesCollection = db.collection("user_roles");
@@ -157,7 +161,7 @@ async function FetchUser() {
         const associationCollection = db.collection("association_details");
         
         // Query to fetch users with role_id 
-        const users = await usersCollection.find({ role_id: { $in: [4, 5] } }).toArray();
+        const users = await usersCollection.find({ role_id: { $in: [4, 5] }, association_id }).toArray();
 
         // Extract all unique role_ids, reseller_ids, client_ids, and association_ids from users
         const roleIds = [...new Set(users.map(user => user.role_id))];
@@ -214,7 +218,7 @@ async function FetchSpecificUserRoleForSelection() {
 
         // Query to fetch all reseller_id and reseller_name
         const roles = await usersCollection.find(
-        { role_id: { $in: [5] } }, // Filter to fetch role_id 1 and 2
+        { role_id: { $in: [5] }, status: true }, // Filter to fetch role_id 1 and 2
         {
             projection: {
                 role_id: 1,
@@ -223,6 +227,7 @@ async function FetchSpecificUserRoleForSelection() {
             }
         }
         ).toArray();
+
         // Return the users data
         return roles;
     } catch (error) {
