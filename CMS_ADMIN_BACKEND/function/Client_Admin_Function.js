@@ -183,6 +183,7 @@ async function CreateAssociationUser(req, res, next) {
             association_phone_no,
             association_email_id,
             association_address,
+            association_wallet:0.00,
             created_date: new Date(),
             modified_date: null,
             created_by,
@@ -210,12 +211,13 @@ async function UpdateAssociationUser(req, res, next) {
             association_name,
             association_phone_no,
             association_address,
+            association_wallet,
             modified_by,
             status
         } = req.body;
 
         // Validate required fields
-        if (!association_id || !association_name || !association_phone_no  || !association_address || !modified_by ) {
+        if (!association_id || !association_name || !association_wallet || !association_phone_no  || !association_address || !modified_by ) {
             return res.status(400).json({ message: 'Association ID Association Name, Phone Number, Address, and Modified By are required' });
         }
 
@@ -231,6 +233,7 @@ async function UpdateAssociationUser(req, res, next) {
         const updateData = {
             association_name,
             association_phone_no,
+            association_wallet:association_wallet || existingAssociation.association_wallet,
             association_address,
             modified_date: new Date(),
             modified_by
@@ -713,6 +716,8 @@ async function CreateUser(req, res, next) {
             client_id: client_id, // Default value, adjust if necessary
             association_id: association_id, // Default value, adjust if necessary
             user_id: newUserId,
+            tag_id: null,
+            assigned_association: null,
             username: username,
             email_id: email_id,
             password: parseInt(password),
@@ -769,7 +774,7 @@ async function UpdateUser(req, res, next) {
                     modified_date: new Date(),
                     modified_by: modified_by,
                     status: status,
-                    password: password
+                    password: parseInt(password),
                 }
             }
         );
@@ -828,14 +833,16 @@ async function DeActivateUser(req, res, next) {
     }
 }
 
+
 // WALLET Functions
-//FetchCommissionAmtClient
+// FetchCommissionAmtClient
 async function FetchCommissionAmtClient(req, res) {
     const { user_id } = req.body;
     try {
         const db = await database.connectToDatabase();
         const usersCollection = db.collection("users");
-        
+        const clientsCollection = db.collection("client_details");
+
         // Fetch the user with the specified user_id
         const user = await usersCollection.findOne({ user_id: user_id });
 
@@ -843,34 +850,88 @@ async function FetchCommissionAmtClient(req, res) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Extract wallet balance from user object
-        const walletBalance = user.wallet_bal;
+        // Extract client_id from the user object
+        const clientId = user.client_id;
 
-        return walletBalance;
+        if (!clientId) {
+            return res.status(404).json({ message: 'Client ID not found for this user' });
+        }
+
+        // Fetch the client with the specified client_id
+        const client = await clientsCollection.findOne({ client_id: clientId });
+
+        if (!client) {
+            return res.status(404).json({ message: 'Client not found' });
+        }
+
+        // Extract client_wallet from client object
+        const clientWallet = client.client_wallet;
+
+        return clientWallet;
 
     } catch (error) {
-        console.error(`Error fetching wallet balance: ${error}`);
-        logger.error(`Error fetching wallet balance: ${error}`);
+        console.error(`Error fetching client wallet balance: ${error}`);
+        logger.error(`Error fetching client wallet balance: ${error}`);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 }
 
+
 //MANAGE FINANCE
-//FetchFinanceDetails
+// FetchFinanceDetails
 async function FetchFinanceDetails() {
     try {
         const db = await database.connectToDatabase();
         const Collection = db.collection("finance_details");
-        
-        const financeDetails = await Collection.find().toArray();
 
-        // Return the financeDetails data
-        return financeDetails;
+        // Fetch all finance details documents
+        const financeDetailsList = await Collection.find().toArray();
+
+        // Prepare the list of finance data with total prices
+        const financeDataList = financeDetailsList.map((financeDetails) => {
+            // Calculate the total percentage of the various charges
+            const totalPercentage = [
+                financeDetails.app_charges,
+                financeDetails.other_charges,
+                financeDetails.parking_charges,
+                financeDetails.rent_charges,
+                financeDetails.open_a_eb_charges,
+                financeDetails.open_other_charges
+            ].reduce((sum, charge) => sum + parseFloat(charge || 0), 0);
+
+            // Calculate the final price
+            const pricePerUnit = parseFloat(financeDetails.eb_charges || 0);
+            const price = 1 * pricePerUnit;
+            const totalPrice = price + (price * totalPercentage / 100);
+
+            // Construct the data object
+            return {
+                finance_id: financeDetails.finance_id,
+                client_id: financeDetails.client_id,
+                eb_charges: financeDetails.eb_charges,
+                app_charges: financeDetails.app_charges,
+                other_charges: financeDetails.other_charges,
+                parking_charges: financeDetails.parking_charges,
+                rent_charges: financeDetails.rent_charges,
+                open_a_eb_charges: financeDetails.open_a_eb_charges,
+                open_other_charges: financeDetails.open_other_charges,
+                created_by: financeDetails.created_by,
+                created_date: financeDetails.created_date,
+                modified_by: financeDetails.modified_by,
+                modified_date: financeDetails.modified_date,
+                totalprice: totalPrice,
+                status: financeDetails.status,
+            };
+        });
+
+        // Return the list of finance data
+        return financeDataList;
     } catch (error) {
-        logger.error(`Error fetching users by role_id: ${error}`);
-        throw new Error('Error fetching users by role_id');
+        logger.error(`Error fetching finance details: ${error}`);
+        throw new Error('Error fetching finance details');
     }
 }
+
 //CreateFinanceDetails
 async function CreateFinanceDetails(req, res, next) {
     try {
@@ -905,7 +966,7 @@ async function CreateFinanceDetails(req, res, next) {
         const result = await financeCollection.insertOne({
             finance_id: newFinanceId,
             client_id,
-            eb_charges,
+            eb_charges: parseInt(eb_charges),
             app_charges,
             other_charges,
             parking_charges,
@@ -967,7 +1028,7 @@ async function UpdateFinanceDetails(req, res, next) {
             {
                 $set: {
                     client_id,
-                    eb_charges,
+                    eb_charges: parseInt(eb_charges) || existingFinance.eb_charges,
                     app_charges,
                     other_charges,
                     parking_charges,

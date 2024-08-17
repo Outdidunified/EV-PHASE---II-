@@ -173,6 +173,7 @@ async function addNewClient(req){
             client_phone_no,
             client_email_id,
             client_address,
+            client_wallet: 0.00,
             created_by,
             created_date,
             modified_by,
@@ -231,11 +232,11 @@ async function updateCommission(req){
 //UpdateClient
 async function updateClient(req){
     try{
-        const {client_id,client_name,client_phone_no,client_address,modified_by,status} = req.body;
+        const {client_id,client_name,client_phone_no,client_address,modified_by,status, client_wallet} = req.body;
         const db = await database.connectToDatabase();
         const clientCollection = db.collection("client_details");
 
-        if(!client_id || !client_name || !client_phone_no || !client_address || !modified_by){
+        if(!client_id || !client_name || !client_phone_no || !client_address || !modified_by || !client_wallet){
             throw new Error(`Client update fields are not available`);
         }
 
@@ -246,6 +247,7 @@ async function updateClient(req){
                 client_name: client_name,
                 client_phone_no: client_phone_no,
                 client_address: client_address,
+                client_wallet,
                 status: status,
                 modified_by: modified_by,
                 modified_date: new Date()
@@ -473,6 +475,8 @@ async function CreateUser(req, res, next) {
             client_id: client_id, // Default value, adjust if necessary
             association_id: null, // Default value, adjust if necessary
             user_id: newUserId,
+            tag_id: null,
+            assigned_association: null,
             username: username,
             email_id: email_id,
             password: parseInt(password),
@@ -527,7 +531,7 @@ async function UpdateUser(req, res, next) {
                     wallet_bal: wallet_bal || existingUser.wallet_bal, 
                     modified_date: new Date(),
                     modified_by: modified_by,
-                    password: password,
+                    password: parseInt(password),
                     status: status,
                 }
             }
@@ -776,13 +780,14 @@ async function AssginChargerToClient(req, res) {
 }
 
 // WALLET Functions
-//FetchCommissionAmtReseller
+// FetchCommissionAmtReseller
 async function FetchCommissionAmtReseller(req, res) {
     const { user_id } = req.body;
     try {
         const db = await database.connectToDatabase();
         const usersCollection = db.collection("users");
-        
+        const resellersCollection = db.collection("reseller_details");
+
         // Fetch the user with the specified user_id
         const user = await usersCollection.findOne({ user_id: user_id });
 
@@ -790,14 +795,29 @@ async function FetchCommissionAmtReseller(req, res) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Extract wallet balance from user object
-        const walletBalance = user.wallet_bal;
+        // Extract reseller_id from the user object
+        const resellerId = user.reseller_id;
 
-        return walletBalance;
+        if (!resellerId) {
+            return res.status(404).json({ message: 'Reseller ID not found for this user' });
+        }
+
+        // Fetch the reseller with the specified reseller_id
+        const reseller = await resellersCollection.findOne({ reseller_id: resellerId });
+
+        if (!reseller) {
+            return res.status(404).json({ message: 'Reseller not found' });
+        }
+
+        // Extract reseller_wallet from reseller object
+        const resellerWallet = reseller.reseller_wallet;
+
+        return resellerWallet;
+
 
     } catch (error) {
-        console.error(`Error fetching wallet balance: ${error}`);
-        logger.error(`Error fetching wallet balance: ${error}`);
+        console.error(`Error fetching reseller wallet balance: ${error}`);
+        logger.error(`Error fetching reseller wallet balance: ${error}`);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 }

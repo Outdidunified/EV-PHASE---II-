@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Auth = require("../auth/Client_Admin_Auth.js")
 const functions = require("../function/Client_Admin_Function.js")
+const CircularJSON = require('circular-json');
 
 // Route to check login credentials
 router.post('/CheckLoginCredentials', async (req, res) => {
@@ -107,15 +108,14 @@ router.post('/DeActivateUser', functions.DeActivateUser, (req, res) => {
 // Route to FetchAssociationUser 
 router.post('/FetchAssociationUser', async (req, res) => {
     try {
-        // Call FetchUser function to get users data
         const user = await functions.FetchAssociationUser(req, res);
-        // Send response with users data
-        res.status(200).json({ status: 'Success', data: user });
-        
+        const safeUser = CircularJSON.stringify(user); // Safely handle circular references
+        res.status(200).json({ status: 'Success', data: JSON.parse(safeUser) });
     } catch (error) {
         console.error('Error in FetchUser route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to fetch users' });
-}});
+    }
+});
 // Route to FetchChargerDetailsWithSession
 router.post('/FetchChargerDetailsWithSession', async (req, res) => {
     try {

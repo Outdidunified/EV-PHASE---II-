@@ -138,7 +138,7 @@ router.get('/FetchUsersWithSpecificRolesToAssgin', async (req, res) => {
     }
 });
 //AddUserToAssociation
-router.post('/AddUserToAssociation', functions.AddUserToAssociation, (req, res) => {
+router.post('/AssUserToAssociation', functions.AddUserToAssociation, (req, res) => {
     res.status(200).json({ status: 'Success', message: 'User added successfully' });
 });
 //UN_ASSGIN
@@ -160,5 +160,53 @@ router.post('/RemoveUserFromAssociation', async (req, res) => {
         res.status(500).json({ status: 'Failed', message: 'Failed to remove user from association' });
     }
 });
+
+
+// ASSGIN TAG ID  TO USER
+// Route to AssignTagIdToUser
+router.post('/AssignTagIdToUser', functions.AssignTagIdToUser, (req, res) => {
+    res.status(200).json({ status: 'Success', message: 'Tag ID assigned successfully to user' });
+});
+
+
+// MANAGE_TAGID
+//FetchAllTagIDs
+router.get('/FetchAllTagIDs', async (req, res) => {
+    try {
+        await functions.FetchAllTagIDs(req, res);
+    } catch (error) {
+        console.error('Error in FetchAllTagIDs route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to fetch tag IDs' });
+    }
+});
+
+//CreateTagID
+router.post('/CreateTagID', async (req, res) => {
+    try {
+        await functions.CreateTagID(req, res);
+    } catch (error) {
+        console.error('Error in CreateTagID route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to create tag ID' });
+    }
+});
+//UpdateTagID
+router.post('/UpdateTagID', async (req, res) => {
+    try {
+        await functions.UpdateTagID(req, res);
+    } catch (error) {
+        console.error('Error in UpdateTagID route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to update tag ID' });
+    }
+});
+//DeactivateTagID
+router.post('/DeactivateOrActivateTagID', async (req, res) => {
+    try {
+        await functions.DeactivateTagID(req, res);
+    } catch (error) {
+        console.error('Error in DeactivateTagID route:', error);
+        res.status(500).json({ status: 'Failed', message: 'Failed to deactivate tag ID' });
+    }
+});
+
 
 module.exports = router;

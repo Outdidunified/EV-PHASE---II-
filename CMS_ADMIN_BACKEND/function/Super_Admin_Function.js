@@ -371,6 +371,8 @@ async function CreateUser(req, res, next) {
             client_id: null, // Default value, adjust if necessary
             association_id: null, // Default value, adjust if necessary
             user_id: newUserId,
+            tag_id: null,
+            assigned_association: null,
             username: username,
             email_id: email_id,
             password: parseInt(password),
@@ -422,7 +424,7 @@ async function UpdateUser(req, res, next) {
                 $set: {
                     username: username,
                     phone_no: phone_no,
-                    wallet_bal: wallet_bal, 
+                    wallet_bal: wallet_bal || existingUser.wallet_bal, 
                     modified_date: new Date(),
                     password: parseInt(password),
                     modified_by: modified_by,
@@ -572,13 +574,12 @@ async function FetchCharger() {
 //CreateCharger
 async function CreateCharger(req, res) {
     try {
-        const { charger_id, tag_id, model, type, vendor, gun_connector, max_current, max_power, socket_count, created_by } = req.body;
+        const { charger_id, charger_model,charger_type, max_current, max_power, created_by } = req.body;
 
         // Validate the input
-        if (!charger_id || !tag_id || !model || !type ||
-            !vendor || !gun_connector || !max_current ||
-            !max_power || !socket_count || !created_by) {
-            return res.status(400).json({ message: 'Charger ID, Tag ID, Model, Type, Vendor, Gun Connector, Max Current, Max Power, Socket Count, and Created By are required' });
+        if (!charger_id ||!charger_model || !charger_type || !max_current ||
+            !max_power ||  !created_by) {
+            return res.status(400).json({ message: 'Charger ID, charger_model, charger_type, Max Current, Max Power and Created By are required' });
         }
 
         const db = await database.connectToDatabase();
@@ -593,21 +594,20 @@ async function CreateCharger(req, res) {
         // Insert the new device
         await devicesCollection.insertOne({
             charger_id,
-            transaction_id: null, // Default or null, depending on your needs
-            tag_id,
-            model,
-            type,
-            vendor,
-            gun_connector,
+            model: null,
+            type: null,
+            vendor: null,
+            charger_model,
+            charger_type,
+            gun_connector: null,
             max_current,
             max_power,
-            socket_count,
-            current_or_active_user: null, // Optional fields with default or null values
+            socket_count: null,
             ip: null,
             lat: null,
             long: null,
             short_description: null,
-            charger_accessibility: null,
+            charger_accessibility: 1,
             superadmin_commission:null,
             reseller_commission: null,
             client_commission: null,
@@ -618,7 +618,6 @@ async function CreateCharger(req, res) {
             assigned_association_id: null,
             assigned_association_date: null,
             finance_id: null,
-            unit_price:null,
             wifi_username:null,
             wifi_password: null,
             created_by,
@@ -639,13 +638,12 @@ async function CreateCharger(req, res) {
 // UpdateCharger
 async function UpdateCharger(req, res) {
     try {
-        const { charger_id, tag_id, model, type, vendor, gun_connector, max_current, max_power, socket_count, modified_by } = req.body;
+        const { charger_id, charger_model, charger_type, vendor, max_current, max_power, modified_by } = req.body;
 
         // Validate the input - ensure charger_id and other required fields are provided
-        if (!charger_id || !tag_id || !model || !type ||
-            !vendor || !gun_connector || !max_current ||
-            !max_power || !socket_count || !modified_by) {
-            return res.status(400).json({ message: 'Charger ID, Tag ID, Model, Type, Vendor, Gun Connector, Max Current, Max Power, Socket Count, and Created By are required' });
+        if (!charger_id || !vendor  || !max_current ||  !charger_model  || !charger_type||
+            !max_power  || !modified_by) {
+            return res.status(400).json({ message: 'Charger ID,charger_model, charger_type, Vendor, Max Current, Max Power and Created By are required' });
         }
 
         const db = await database.connectToDatabase();
@@ -663,14 +661,11 @@ async function UpdateCharger(req, res) {
             { charger_id },
             {
                 $set: {
-                    tag_id,
-                    model,
-                    type,
+                    charger_model,
+                    charger_type,
                     vendor,
-                    gun_connector,
                     max_current,
                     max_power,
-                    socket_count,
                     modified_by,
                     modified_date: new Date(),
                 }
@@ -874,7 +869,7 @@ async function CreateReseller(req, res) {
         } = req.body;
 
         // Validate required fields
-        if (!reseller_name || !reseller_phone_no || !reseller_email_id || !reseller_address || !created_by) {
+        if (!reseller_name || !reseller_phone_no || !reseller_email_id || !reseller_address || !created_by ) {
             return res.status(400).json({ message: 'Reseller Name, Phone Number, Email ID, Address, and Created By are required' });
         }
 
@@ -907,10 +902,11 @@ async function CreateReseller(req, res) {
             reseller_phone_no,
             reseller_email_id,
             reseller_address,
+            reseller_wallet: 0.00,
             created_date: new Date(),
             modified_date: null,
             created_by,
-            modified_by: null,
+            modified_by: null, 
             status: true
         });
 
@@ -929,13 +925,14 @@ async function UpdateReseller(req, res) {
             reseller_id,
             reseller_phone_no,
             reseller_address,
+            reseller_wallet,
             modified_by,
             status
         } = req.body;
 
         // Validate required fields
-        if (!reseller_id  || !reseller_phone_no || !reseller_address || !modified_by || typeof status !== 'boolean') {
-            return res.status(400).json({ message: 'Reseller ID, Name, Phone Number, status, Email ID, Address, and Modified By are required' });
+        if (!reseller_id  || !reseller_phone_no || !reseller_address || !reseller_wallet ||!modified_by || typeof status !== 'boolean') {
+            return res.status(400).json({ message: 'Reseller ID, Name, Phone Number,reseller_wallet,  status, Email ID, Address, and Modified By are required' });
         }
 
         const db = await database.connectToDatabase();
@@ -955,6 +952,7 @@ async function UpdateReseller(req, res) {
                 $set: {
                     reseller_phone_no,
                     reseller_address,
+                    reseller_wallet,
                     modified_date: new Date(),
                     modified_by,
                     status
@@ -1055,6 +1053,7 @@ async function FetchResellersToAssgin(req, res) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 }
+
 // AssignChargerToReseller
 async function AssignChargerToReseller(req, res) {
     try {
@@ -1084,6 +1083,7 @@ async function AssignChargerToReseller(req, res) {
             {
                 $set: {
                     assigned_reseller_id: reseller_id,
+                    charger_accessibility: 2,
                     superadmin_commission: "0",
                     assigned_reseller_date: new Date(),
                     modified_date: new Date(),
@@ -1104,9 +1104,6 @@ async function AssignChargerToReseller(req, res) {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 }
-
-
-
 
 
 module.exports = { 
@@ -1142,4 +1139,5 @@ module.exports = {
     AssignChargerToReseller,
     FetchResellersToAssgin,
     FetchUnAllocatedChargerToAssgin,
+
 };
