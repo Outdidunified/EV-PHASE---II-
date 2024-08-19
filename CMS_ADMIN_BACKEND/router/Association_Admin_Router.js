@@ -173,7 +173,12 @@ router.post('/AssignTagIdToUser', functions.AssignTagIdToUser, (req, res) => {
 //FetchAllTagIDs
 router.get('/FetchAllTagIDs', async (req, res) => {
     try {
-        await functions.FetchAllTagIDs(req, res);
+        const tags = await functions.FetchAllTagIDs(req, res);
+        if(tags.status === 404){
+            res.status(200).json({ status: 'Success', data: tags.message });
+        }else{
+            res.status(200).json({ status: 'Success', data: tags });
+        }
     } catch (error) {
         console.error('Error in FetchAllTagIDs route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to fetch tag IDs' });

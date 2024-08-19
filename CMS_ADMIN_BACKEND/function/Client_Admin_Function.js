@@ -5,52 +5,57 @@ const logger = require('../logger');
 //FetchAssociationUser
 async function FetchAssociationUser(req, res) {
     try {
+
         const { client_id } = req.body; 
         const db = await database.connectToDatabase();
         const associationCollection = db.collection("association_details");
 
         // Fetch association details for the given client_id
         const users = await associationCollection.find({ client_id: parseInt(client_id) }).toArray();
-        
         if (users.length === 0) {
-            return res.status(404).json({ message: "No association found for the provided client_id." });
+            const message = "No association found for the provided client_id.";
+            const statusCode = 404;
+            return {statusCode, message};
+            //return res.status(200).json({ message: "No association found for the provided client_id." });
+        }else{
+            const reseller_ids = users.map(user => user.reseller_id);
+            const client_ids = users.map(user => user.client_id);
+            
+
+            // Fetch reseller details
+            const resellerCollection = db.collection("reseller_details");
+            const resellers = await resellerCollection.find({ reseller_id: { $in: reseller_ids } }).toArray();
+
+            // Fetch client details
+            const clientCollection = db.collection("client_details");  // Assuming 'client_details' is the correct collection name
+            const clients = await clientCollection.find({ client_id: { $in: client_ids } }).toArray();
+            
+
+            // Map resellers and clients by their IDs for quick lookup
+            const resellerMap = resellers.reduce((acc, reseller) => {
+                acc[reseller.reseller_id] = reseller.reseller_name;
+                return acc;
+            }, {});
+
+            const clientMap = clients.reduce((acc, client) => {
+                acc[client.client_id] = client.client_name;
+                return acc;
+            }, {});
+
+            // Attach names to users
+            const result = users.map(user => ({
+                ...user,
+                reseller_name: resellerMap[user.reseller_id] || 'Unknown Reseller',
+                client_name: clientMap[user.client_id] || 'Unknown Client'
+            }));
+
+            return result;
         }
-
-        const reseller_ids = users.map(user => user.reseller_id);
-        const client_ids = users.map(user => user.client_id);
-
-        // Fetch reseller details
-        const resellerCollection = db.collection("reseller_details");
-        const resellers = await resellerCollection.find({ reseller_id: { $in: reseller_ids } }).toArray();
-
-        // Fetch client details
-        const clientCollection = db.collection("client_details");  // Assuming 'client_details' is the correct collection name
-        const clients = await clientCollection.find({ client_id: { $in: client_ids } }).toArray();
-
-        // Map resellers and clients by their IDs for quick lookup
-        const resellerMap = resellers.reduce((acc, reseller) => {
-            acc[reseller.reseller_id] = reseller.reseller_name;
-            return acc;
-        }, {});
-
-        const clientMap = clients.reduce((acc, client) => {
-            acc[client.client_id] = client.client_name;
-            return acc;
-        }, {});
-
-        // Attach names to users
-        const result = users.map(user => ({
-            ...user,
-            reseller_name: resellerMap[user.reseller_id] || 'Unknown Reseller',
-            client_name: clientMap[user.client_id] || 'Unknown Client'
-        }));
-
-        return result;
 
     } catch (error) {
         console.error(`Error fetching client details: ${error}`);
         logger.error(`Error fetching client details: ${error}`);
-        return res.status(500).json({ message: 'Error fetching client details' });
+        res.status(500).json({ message: 'Error fetching client details' });
     }
 }
 
@@ -697,7 +702,12 @@ async function CreateUser(req, res, next) {
         }
         
         // Check if the email_id already exists
-        const existingUser = await Users.findOne({ email_id: email_id });
+        const existingUser = await Users.findOne({ 
+            $or: [
+                { username: username },
+                { email_id: email_id }
+            ]
+         });
         if (existingUser) {
             return res.status(400).json({ message: 'Email ID already exists' });
         }

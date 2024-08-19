@@ -109,8 +109,12 @@ router.post('/DeActivateUser', functions.DeActivateUser, (req, res) => {
 router.post('/FetchAssociationUser', async (req, res) => {
     try {
         const user = await functions.FetchAssociationUser(req, res);
-        const safeUser = CircularJSON.stringify(user); // Safely handle circular references
-        res.status(200).json({ status: 'Success', data: JSON.parse(safeUser) });
+        //const safeUser = CircularJSON.stringify(user); // Safely handle circular references
+        if(user.statusCode === 404){
+            res.status(user.statusCode).json({ status: 'Failed', data: user.message });
+        }else{
+            res.status(200).json({ status: 'Success', data: user });
+        }
     } catch (error) {
         console.error('Error in FetchUser route:', error);
         res.status(500).json({ status: 'Failed', message: 'Failed to fetch users' });

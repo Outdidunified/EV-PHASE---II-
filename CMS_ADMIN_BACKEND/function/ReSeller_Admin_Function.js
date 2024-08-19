@@ -173,7 +173,7 @@ async function addNewClient(req){
             client_phone_no,
             client_email_id,
             client_address,
-            client_wallet: 0.00,
+            client_wallet: Double(0.00),
             created_by,
             created_date,
             modified_by,
@@ -456,7 +456,12 @@ async function CreateUser(req, res, next) {
         }
         
         // Check if the email_id already exists
-        const existingUser = await Users.findOne({ email_id: email_id });
+        const existingUser = await Users.findOne({ 
+            $or: [
+                { username: username },
+                { email_id: email_id }
+            ] 
+        });
         if (existingUser) {
             return res.status(400).json({ message: 'Email ID already exists' });
         }

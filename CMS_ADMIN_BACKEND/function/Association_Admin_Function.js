@@ -256,7 +256,12 @@ async function CreateUser(req, res, next) {
         }
         
         // Check if the email_id already exists
-        const existingUser = await Users.findOne({ email_id: email_id });
+        const existingUser = await Users.findOne({ 
+            $or: [
+                { username: username },
+                { email_id: email_id }
+            ]
+         });
         if (existingUser) {
             return res.status(400).json({ message: 'Email ID already exists' });
         }
@@ -579,7 +584,7 @@ async function AddUserToAssociation(req, res) {
 
         // Check if the user exists
         const existingUser = await usersCollection.findOne({ email_id: email_id  });
-        if (!existingUser) {
+        if (!existingUser || existingUser.role_id !== 5) {
             return res.status(404).json({ message: 'User not found' });
         }
 
@@ -649,7 +654,7 @@ async function FetchUsersWithSpecificRolesToUnAssgin(req, res) {
 
 
         if (!users || users.length === 0) {
-            return res.status(404).json({ message: 'No users found' });
+            return res.status(200).json({ message: 'No users found' });
         }
 
         return res.status(200).json({ status: 'Success', data: users });
@@ -769,14 +774,15 @@ async function FetchAllTagIDs(req, res) {
 
         // Fetch all tag IDs
         const tags = await tagsCollection.find({}).toArray();
-
         // Check if tags are found
         if (!tags || tags.length === 0) {
-            return res.status(404).json({ message: 'No tags found' });
+            const message = "No tags found";
+            const status = 404;
+            return {message, status};
         }
 
         // Return the tags data
-        return res.status(200).json({ status: 'Success', data: tags });
+        return tags;
     } catch (error) {
         console.error(`Error fetching tag IDs: ${error}`);
         logger.error(`Error fetching tag IDs: ${error}`);

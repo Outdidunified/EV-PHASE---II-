@@ -352,7 +352,12 @@ async function CreateUser(req, res, next) {
         }
         
         // Check if the email_id already exists
-        const existingUser = await Users.findOne({ email_id: email_id });
+        const existingUser = await Users.findOne({ 
+            $or: [
+                { username: username },
+                { email_id: email_id }
+            ]
+         });
         if (existingUser) {
             return res.status(400).json({ message: 'Email ID already exists' });
         }
@@ -574,11 +579,11 @@ async function FetchCharger() {
 //CreateCharger
 async function CreateCharger(req, res) {
     try {
-        const { charger_id, charger_model,charger_type, max_current, max_power, created_by } = req.body;
+        const { charger_id, charger_model,charger_type, max_current, max_power, created_by, vendor } = req.body;
 
         // Validate the input
         if (!charger_id ||!charger_model || !charger_type || !max_current ||
-            !max_power ||  !created_by) {
+            !max_power ||  !created_by || !vendor) {
             return res.status(400).json({ message: 'Charger ID, charger_model, charger_type, Max Current, Max Power and Created By are required' });
         }
 
@@ -596,7 +601,7 @@ async function CreateCharger(req, res) {
             charger_id,
             model: null,
             type: null,
-            vendor: null,
+            vendor,
             charger_model,
             charger_type,
             gun_connector: null,
@@ -737,7 +742,7 @@ async function FetchResellers(req, res) {
         const resellers = await resellerCollection.find({}).toArray();
 
         if (!resellers || resellers.length === 0) {
-            return res.status(404).json({ message: 'No resellers found' });
+            return res.status(200).json({ message: 'No resellers found' });
         }
 
         // Return the reseller data
