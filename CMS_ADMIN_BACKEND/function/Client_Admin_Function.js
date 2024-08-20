@@ -1188,12 +1188,12 @@ async function FetchUnAllocatedChargerToAssgin(req) {
 //AssginChargerToAssociation
 async function AssginChargerToAssociation(req, res) {
     try {
-        const { association_id, charger_id, client_commission ,modified_by} = req.body;
+        const { association_id, charger_id, client_commission , finance_id ,modified_by} = req.body;
 
 
         // Validate required fields
-        if (!association_id || !charger_id || !modified_by || !client_commission) {
-            return res.status(400).json({ message: 'Association ID, Charger IDs, client_commission and Modified By are required' });
+        if (!association_id || !charger_id || !modified_by || !client_commission || ! finance_id) {
+            return res.status(400).json({ message: 'Association ID, Charger IDs,finance_id,  client_commission and Modified By are required' });
         }
 
         const db = await database.connectToDatabase();
@@ -1215,6 +1215,7 @@ async function AssginChargerToAssociation(req, res) {
             {
                 $set: {
                     assigned_association_id: association_id,
+                    finance_id: parseInt(finance_id),
                     client_commission: client_commission,
                     assigned_association_date: new Date(),
                     modified_date: new Date(),
