@@ -58,7 +58,6 @@ async function FetchAssociationUser(req, res) {
         res.status(500).json({ message: 'Error fetching client details' });
     }
 }
-
 // FetchChargerDetailsWithSession
 async function FetchChargerDetailsWithSession(req) {
     try {
@@ -71,6 +70,7 @@ async function FetchChargerDetailsWithSession(req) {
 
         const db = await database.connectToDatabase();
         const chargerCollection = db.collection("charger_details");
+        const financeDetailsCollection = db.collection("finance_details");
 
         // Aggregation pipeline to fetch charger details with sorted session data
         const result = await chargerCollection.aggregate([
@@ -113,7 +113,7 @@ async function FetchChargerDetailsWithSession(req) {
                     charger_id: 1,
                     assigned_association_id: 1,
                     finance_id: 1,
-                    client_commission:1,              
+                    client_commission: 1,
                     sessiondata: 1
                 }
             }
@@ -123,13 +123,42 @@ async function FetchChargerDetailsWithSession(req) {
             throw new Error('No chargers found for the specified Association ID');
         }
 
-        // Sort sessiondata within each chargerID based on the first session's stop_time
+        // Fetch all finance details documents
+        const financeDetailsList = await financeDetailsCollection.find().toArray();
+
+        // Prepare a map for easy lookup of finance details by finance_id
+        const financeDetailsMap = financeDetailsList.reduce((map, financeDetails) => {
+            map[financeDetails.finance_id] = financeDetails;
+            return map;
+        }, {});
+
+        // Calculate the total price and append it to each charger result
         result.forEach(charger => {
+            const financeDetails = financeDetailsMap[charger.finance_id];
+
+            if (financeDetails) {
+                const totalPercentage = [
+                    financeDetails.app_charges,
+                    financeDetails.other_charges,
+                    financeDetails.parking_charges,
+                    financeDetails.rent_charges,
+                    financeDetails.open_a_eb_charges,
+                    financeDetails.open_other_charges
+                ].reduce((sum, charge) => sum + parseFloat(charge || 0), 0);
+
+                const pricePerUnit = parseFloat(financeDetails.eb_charges || 0);
+                const price = 1 * pricePerUnit;
+                const totalPrice = price + (price * totalPercentage / 100);
+
+                charger.total_price = totalPrice.toFixed(2); // Append the total price to the charger details
+            } else {
+                charger.total_price = null; // If no finance details found, set total_price to null
+            }
+
             if (charger.sessiondata.length > 1) {
                 charger.sessiondata.sort((a, b) => new Date(b.stop_time) - new Date(a.stop_time));
             }
         });
-
         return result;
 
     } catch (error) {
@@ -137,6 +166,7 @@ async function FetchChargerDetailsWithSession(req) {
         throw error;
     }
 }
+
 
 
 //CreateAssociationUser
@@ -460,11 +490,61 @@ async function FetchAllocatedCharger(req) {
         const { client_id } = req.body;
         const db = await database.connectToDatabase();
         const devicesCollection = db.collection("charger_details");
+        const financeCollection = db.collection("finance_details");
 
-        // Aggregation to fetch chargers with association names
-        const chargersWithAssociations = await devicesCollection.aggregate([
+        // Fetch the eb_charges from finance_details
+        const financeDetails = await financeCollection.findOne();
+        if (!financeDetails) {
+            throw new Error('No finance details found');
+        }
+
+        // Aggregation to fetch chargers with client names and append unit_price
+        const chargersWithClients = await devicesCollection.aggregate([
             {
-                $match: { assigned_association_id: { $ne: null }, assigned_client_id: client_id } // Find chargers with assigned associations
+                $match: { assigned_client_id: { $ne: null }, assigned_client_id: client_id }
+            },
+            {
+                $lookup: {
+                    from: 'association_details',
+                    localField: 'assigned_association_id',
+                    foreignField: 'association_id',
+                    as: 'associationDetails'
+                }
+            },
+            {
+                $unwind: '$associationDetails'
+            },
+            {
+                $addFields: {
+                    association_name: '$associationDetails.association_name',
+                    unit_price: financeDetails.eb_charges // Append unit_price to each charger
+                }
+            },
+            {
+                $project: {
+                    clientDetails: 0 // Exclude the full clientDetails object
+                }
+            }
+        ]).toArray();
+
+        return chargersWithClients; // Only return data, don't send response
+    } catch (error) {
+        console.error(`Error fetching chargers: ${error}`);
+        throw new Error('Failed to fetch chargers');
+    }
+}
+
+// FetchUnAllocatedCharger
+async function FetchUnAllocatedCharger(req) {
+    try {
+        const { client_id } = req.body;
+        const db = await database.connectToDatabase();
+        const devicesCollection = db.collection("charger_details");
+
+        // Aggregation to fetch unallocated chargers with association names (even though there are none)
+        const chargersWithoutAssociations = await devicesCollection.aggregate([
+            {
+                $match: { assigned_association_id: null, assigned_client_id: client_id } // Find chargers with no assigned associations
             },
             {
                 $lookup: {
@@ -475,11 +555,8 @@ async function FetchAllocatedCharger(req) {
                 }
             },
             {
-                $unwind: '$associationDetails' // Unwind the array to include association details as an object
-            },
-            {
                 $addFields: {
-                    association_name: '$associationDetails.association_name' // Include the association name in the result
+                    association_name: { $arrayElemAt: ['$associationDetails.association_name', 0] } // Include the association name, if any (which won't be in this case)
                 }
             },
             {
@@ -489,28 +566,13 @@ async function FetchAllocatedCharger(req) {
             }
         ]).toArray();
 
-        return chargersWithAssociations; // Only return data, don't send response
+        return chargersWithoutAssociations; // Only return data, don't send response
     } catch (error) {
         console.error(`Error fetching chargers: ${error}`);
         throw new Error('Failed to fetch chargers'); // Throw error, handle in route
     }
 }
 
-//FetchUnAllocatedCharger
-async function FetchUnAllocatedCharger(req) {
-    try {
-        const {client_id} = req.body
-        const db = await database.connectToDatabase();
-        const devicesCollection = db.collection("charger_details");
-
-        const chargers = await devicesCollection.find({ assigned_association_id: null, assigned_client_id: client_id  }).toArray();
-
-        return chargers; // Only return data, don't send response
-    } catch (error) {
-        console.error(`Error fetching chargers: ${error}`);
-        throw new Error('Failed to fetch chargers'); // Throw error, handle in route
-    }
-}
 //DeActivateOrActivate 
 async function DeActivateOrActivateCharger(req, res, next) {
     try {

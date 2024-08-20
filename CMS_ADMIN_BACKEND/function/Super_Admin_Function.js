@@ -566,16 +566,30 @@ async function FetchCharger() {
     try {
         const db = await database.connectToDatabase();
         const devicesCollection = db.collection("charger_details");
+        const financeCollection = db.collection("finance_details");
 
-        // Query to fetch chargers where assigned_reseller_id is null
+        // Fetch all chargers where assigned_reseller_id is null
         const chargers = await devicesCollection.find({ assigned_reseller_id: null }).toArray();
 
-        return chargers; // Only return data, don't send response
+        // Fetch the eb_charges from finance_details (assuming there's only one relevant finance document)
+        const financeDetails = await financeCollection.findOne();
+
+        if (!financeDetails) {
+            throw new Error('No finance details found');
+        }
+
+        // Append the eb_charges to each charger
+        const chargersWithUnitPrice = chargers.map(charger => ({
+            ...charger,
+            unit_price: financeDetails.eb_charges
+        }));
+        return chargersWithUnitPrice; // Return the chargers with appended unit_price
     } catch (error) {
         console.error(`Error fetching chargers: ${error}`);
-        throw new Error('Failed to fetch chargers'); // Throw error, handle in route
+        throw new Error('Failed to fetch chargers');
     }
 }
+
 //CreateCharger
 async function CreateCharger(req, res) {
     try {

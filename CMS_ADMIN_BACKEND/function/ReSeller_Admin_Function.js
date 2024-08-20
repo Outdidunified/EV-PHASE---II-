@@ -600,29 +600,37 @@ async function DeActivateUser(req, res, next) {
 //FetchAllocatedCharger
 async function FetchAllocatedCharger(req) {
     try {
-        const {reseller_id} = req.body;
+        const { reseller_id } = req.body;
         const db = await database.connectToDatabase();
         const devicesCollection = db.collection("charger_details");
+        const financeCollection = db.collection("finance_details");
 
-        // Aggregation to fetch chargers with client names
+        // Fetch the eb_charges from finance_details
+        const financeDetails = await financeCollection.findOne();
+        if (!financeDetails) {
+            throw new Error('No finance details found');
+        }
+
+        // Aggregation to fetch chargers with client names and append unit_price
         const chargersWithClients = await devicesCollection.aggregate([
             {
-                $match: { assigned_client_id: { $ne: null }, assigned_reseller_id: reseller_id } // Find chargers with assigned clients
+                $match: { assigned_client_id: { $ne: null }, assigned_reseller_id: reseller_id }
             },
             {
                 $lookup: {
-                    from: 'client_details', // Collection name for client details
+                    from: 'client_details',
                     localField: 'assigned_client_id',
-                    foreignField: 'client_id', // Assuming client_id is the field name in client_details
+                    foreignField: 'client_id',
                     as: 'clientDetails'
                 }
             },
             {
-                $unwind: '$clientDetails' // Unwind the array to include client details as an object
+                $unwind: '$clientDetails'
             },
             {
                 $addFields: {
-                    client_name: '$clientDetails.client_name' // Include the client name in the result
+                    client_name: '$clientDetails.client_name',
+                    unit_price: financeDetails.eb_charges // Append unit_price to each charger
                 }
             },
             {
@@ -635,24 +643,39 @@ async function FetchAllocatedCharger(req) {
         return chargersWithClients; // Only return data, don't send response
     } catch (error) {
         console.error(`Error fetching chargers: ${error}`);
-        throw new Error('Failed to fetch chargers'); // Throw error, handle in route
+        throw new Error('Failed to fetch chargers');
     }
 }
 //FetchUnAllocatedCharger
 async function FetchUnAllocatedCharger(req) {
     try {
-        const {reseller_id} = req.body
+        const { reseller_id } = req.body;
         const db = await database.connectToDatabase();
         const devicesCollection = db.collection("charger_details");
+        const financeCollection = db.collection("finance_details");
 
-        const chargers = await devicesCollection.find({ assigned_client_id: null, assigned_reseller_id: reseller_id  }).toArray();
+        // Fetch the eb_charges from finance_details
+        const financeDetails = await financeCollection.findOne();
+        if (!financeDetails) {
+            throw new Error('No finance details found');
+        }
 
-        return chargers; // Only return data, don't send response
+        // Fetch chargers that are not allocated to any client
+        const chargers = await devicesCollection.find({ assigned_client_id: null, assigned_reseller_id: reseller_id }).toArray();
+
+        // Append unit_price to each charger
+        const chargersWithUnitPrice = chargers.map(charger => ({
+            ...charger,
+            unit_price: financeDetails.eb_charges
+        }));
+
+        return chargersWithUnitPrice; // Only return data, don't send response
     } catch (error) {
         console.error(`Error fetching chargers: ${error}`);
-        throw new Error('Failed to fetch chargers'); // Throw error, handle in route
+        throw new Error('Failed to fetch chargers');
     }
 }
+
 //DeActivateOrActivateCharger
 async function DeActivateOrActivateCharger(req, res, next) {
     try {

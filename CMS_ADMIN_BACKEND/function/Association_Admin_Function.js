@@ -401,18 +401,33 @@ async function DeActivateUser(req, res, next) {
 //FetchAllocatedChargerByClientToAssociation
 async function FetchAllocatedChargerByClientToAssociation(req) {
     try {
-        const {association_id} = req.body
+        const { association_id } = req.body;
         const db = await database.connectToDatabase();
         const devicesCollection = db.collection("charger_details");
+        const financeCollection = db.collection("finance_details");
 
-        const chargers = await devicesCollection.find({ assigned_association_id: association_id  }).toArray();
+        // Fetch the eb_charges from finance_details
+        const financeDetails = await financeCollection.findOne();
+        if (!financeDetails) {
+            throw new Error('No finance details found');
+        }
 
-        return chargers; // Only return data, don't send response
+        // Fetch chargers assigned to the specified association_id
+        const chargers = await devicesCollection.find({ assigned_association_id: association_id }).toArray();
+
+        // Append unit_price to each charger
+        const chargersWithUnitPrice = chargers.map(charger => ({
+            ...charger,
+            unit_price: financeDetails.eb_charges
+        }));
+
+        return chargersWithUnitPrice; // Only return data, don't send response
     } catch (error) {
         console.error(`Error fetching chargers: ${error}`);
-        throw new Error('Failed to fetch chargers'); // Throw error, handle in route
+        throw new Error('Failed to fetch chargers');
     }
 }
+
 //UpdateDevice 
 async function UpdateDevice(req, res, next) {
     try {
