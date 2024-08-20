@@ -1970,3 +1970,16 @@
 19/08/2024 17:10:23 [INFO]: HTTP Server listening on port 8586
 19/08/2024 17:10:46 [INFO]: HTTP Server listening on port 8586
 19/08/2024 17:11:02 [INFO]: HTTP Server listening on port 8586
+19/08/2024 18:33:50 [INFO]: HTTP Server listening on port 8586
+19/08/2024 18:34:18 [ERROR]: Error assigning user to association: MongoServerError: The field 'assigned_association' must be an array but is of type int in document {_id: ObjectId('66c330bbc793ed83516a5f19')}
+19/08/2024 18:39:50 [INFO]: HTTP Server listening on port 8586
+19/08/2024 18:40:13 [INFO]: HTTP Server listening on port 8586
+19/08/2024 18:40:24 [ERROR]: Error assigning user to association: MongoServerError: The field 'assigned_association' must be an array but is of type int in document {_id: ObjectId('66c330bbc793ed83516a5f19')}
+19/08/2024 18:40:24 [ERROR]: Error assigning user to association: MongoServerError: The field 'assigned_association' must be an array but is of type int in document {_id: ObjectId('66c330bbc793ed83516a5f19')}
+19/08/2024 18:42:27 [INFO]: HTTP Server listening on port 8586
+19/08/2024 18:46:08 [INFO]: HTTP Server listening on port 8586
+20/08/2024 10:17:35 [INFO]: HTTP Server listening on port 8586
+20/08/2024 10:31:10 [INFO]: HTTP Server listening on port 8586
+20/08/2024 10:32:50 [INFO]: HTTP Server listening on port 8586
+20/08/2024 10:35:52 [INFO]: HTTP Server listening on port 8586
+20/08/2024 10:37:16 [INFO]: HTTP Server listening on port 8586
